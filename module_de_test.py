@@ -1,3 +1,4 @@
 class test:
 	def __init__():
-		a
+		a = 4
+		b = 6
