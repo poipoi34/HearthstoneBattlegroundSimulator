@@ -1,3 +1,3 @@
 class test:
 	def __init__():
-		a
+		a = 5
