@@ -25,7 +25,7 @@ def add_subscriber(observer, event_name, effect):
 	Event.event_subscriber[event_name].append(observer)
 	observer.trigger[event_name] = effect
 
-def create_event(event):
+def fire_event(event):
 	if not event.name in Event.event_subscriber:
 		Event.event_subscriber[event.name] = []
 	for sub in Event.event_subscriber[event.name]:

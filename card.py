@@ -37,7 +37,7 @@ class Card:
 	### combat methods
 	def fight(o,card):
 		#print(s.name, " attacked ",card.name) 
-		event.create_event(event.Event("on minion attack",[o,card]))
+		event.fire_event(event.Event("on minion attack",[o,card]))
 		o.take_damage(card)
 		card.take_damage(o)
 		if (o.health <= 0):
@@ -45,22 +45,22 @@ class Card:
 		if (card.health <= 0):
 			card.die()
 		o.can_attack = False
-		event.create_event(event.Event("after minion attack",[o,card]))
+		event.fire_event(event.Event("after minion attack",[o,card]))
 		
 	def take_damage(o, card):
 		if (o.divineShield and card.attack > 0):
 			o.divineShield = False
-			event.create_event(event.Event("divine shield lost",[o]))
+			event.fire_event(event.Event("divine shield lost",[o]))
 			return
 		o.health-=card.attack
 
 	def die(o):
-		event.create_event(event.Event("on minion death",[o]))
+		event.fire_event(event.Event("on minion death",[o]))
 		o.ghost = True
 		if (o.deathrattle_holder != None):
 			o.game_manager.deathrattle_buffer.append(o.deathrattle_holder)
 		o.owner.army.remove(o)
-		event.create_event(event.Event("after minion death",[o]))
+		event.fire_event(event.Event("after minion death",[o]))
 		
 	
 	def set_game_manager(o, game_manager):

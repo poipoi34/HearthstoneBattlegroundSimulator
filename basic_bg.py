@@ -39,7 +39,7 @@ class player():
 		if (o.count_minion_alive() < 7):
 			o.army_before_resolution.insert(at, card)
 			card.owner = o
-			event.create_event(event.Event("after summon",[card]))
+			event.fire_event(event.Event("after summon",[card]))
 
 
 	def count_minion_alive(o):
@@ -114,7 +114,7 @@ class game_manager():
 		defending_player = player2
 		player1.army_before_resolution = player1.army[:]
 		player2.army_before_resolution = player2.army[:]
-		event.create_event(event.Event("enter arena",[player1,player2]))
+		event.fire_event(event.Event("enter arena",[player1,player2]))
 
 		while (done == False):
 			attacking_player.attack(defending_player)
