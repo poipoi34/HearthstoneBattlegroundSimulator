@@ -44,6 +44,13 @@ class battle_manager():
 		while (done == False):
 			
 			attacking_player.attack(defending_player)
+			
+			for deathrattle_holder in o.deathrattle_buffer:
+				deathrattle_holder.executeAll()
+			o.deathrattle_buffer = []
+			o.player1.clear_ghosts()
+			o.player2.clear_ghosts()
+
 			attacker_died = len(attacking_player.army) == 0
 			defender_died = len(defending_player.army) == 0
 			if (attacker_died and defender_died):
@@ -52,15 +59,6 @@ class battle_manager():
 				return defending_player
 			if (defender_died):
 				return attacking_player
-
-			
-			
-			for deathrattle_holder in o.deathrattle_buffer:
-				deathrattle_holder.executeAll()
-			o.deathrattle_buffer = []
-			o.player1.clear_ghosts()
-			o.player2.clear_ghosts()
-
 			attacking_player, defending_player = defending_player, attacking_player
 			
 
@@ -79,8 +77,8 @@ class battle_manager():
 
 class Board_state:
 	def __init__(o, battle_manager, event):
-		o.player1 = battle_manager.player1.deepcopy()
-		o.player2 = battle_manager.player2.deepcopy()
+		o.player1 = battle_manager.player1.copy_state()
+		o.player2 = battle_manager.player2.copy_state()
 		o.event = event
 
 	def __str__(o):

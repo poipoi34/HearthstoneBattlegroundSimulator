@@ -1,14 +1,15 @@
 import pygame as pg
+import copy
 import time
 import event_manager
 import deathrattle
 
-class Card:
+class Card(event_manager.Event_listener):
 	
 	####methods
 	def __init__(o,attack = 0,health = 1,*,name = ""):
 		
-
+		event_manager.Event_listener.__init__(o)
 		o.name = name
 		
 		###combat attributes
@@ -29,6 +30,8 @@ class Card:
 
 		###others
 		o.owner = None
+
+		o.pos = -1
 
 
 	### combat methods
@@ -86,17 +89,17 @@ class Card:
 		return [px+25,py+50]
 
 	def __repr__(o):
-		return o.__str__()
+		return o.__str__() + str(id(o))
 
 
 
 
-class Bolvar(Card, event_manager.Event_listener):
+
+class Bolvar(Card):
 	def __init__(o):
 		Card.__init__(o, 1, 7, name='Bolvar')
-		event_manager.Event_listener.__init__(o)
-
 		o.divineShield = True
+
 		def effect( param):
 			if (param["source_minion"].owner == o.owner):
 				o.attack+=2

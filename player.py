@@ -1,4 +1,5 @@
 from random import*
+import copy
 import event_manager
 
 class player():
@@ -95,11 +96,25 @@ class player():
 			card.set_battle_manager(battle_manager)
 		o.game_manager = battle_manager
 
-	def deepcopy(o):
+	#copy state of a player to store it in battle history
+	def copy_state(o):
 		res = player(name = o.name)
-		res.army_before_resolution = o.army_before_resolution[:]
+		copied_army = []
+		for card in o.army_before_resolution:
+			copied_army.append(copy.copy(card))
+		res.army_before_resolution = copied_army
 		return res
+	
+	#clone players so that they can battle to the death for our entertainment
+	def clone(o):
+		clone = player(name = "clone of " + o.name)
+		for card in o.army:
+			clone.add_to_army(copy.deepcopy(card))#deepcopy for the deathrattles owner
+		
+		clone.attacking_indice = o.attacking_indice
+		return clone
 
+	
 	def __repr__(o):
 		return o.__str__()
 	
