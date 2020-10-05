@@ -6,24 +6,25 @@ from random import*
 from card import*
 from sys import exit
 from battle_manager import*
-import event
+import event_manager
 
 card_width = 75
 card_height = 150
 divine_shield_margin = 5
 
-class Displayer(event.Event_listener):
+class Displayer(event_manager.Event_listener):
 
 	divineShield = pg.Surface([card_width + divine_shield_margin*2, card_height + divine_shield_margin*2])
 	divineShield.fill(pg.Color(255, 255, 0))
 	divineShield.set_alpha(128)
 	
-	def __init__(o):
-		event.Event_listener.__init__(o)
-		event.on_enter_arena.add_listener(o, o.react_enter_arena)
-		event.on_minion_attack.add_listener(o, o.react_minion_on_attack)
-		event.after_minion_attack.add_listener(o, o.react_minion_after_attack)
-		event.after_summon.add_listener(o, o.react_after_summon)
+	def __init__(o, battle_manager):
+		event_manager.Event_listener.__init__(o)
+		event_manager.add_listener(o, "on_enter_arena", o.react_enter_arena)
+		event_manager.add_listener(o, "on_minion_attack", o.react_minion_on_attack)
+		event_manager.add_listener(o, "after_minion_attack", o.react_minion_after_attack)
+		event_manager.add_listener(o, "after_summon", o.react_after_summon)
+		event_manager.add_listener(o, "on_board_update", o.on_board_update_reaction)
 		
 		pg.init()
 		o.win = [1000,1000]
@@ -40,10 +41,10 @@ class Displayer(event.Event_listener):
 			pg.draw.line(o.arena,line_color,[0,o.win[1]*i/4],[o.win[0],o.win[1]*i/4])
 
 		###players
-		o.att_player = []
-		o.def_player = []
-		o.bot_player = []
-		o.top_player = []
+		o.att_player = None
+		o.def_player = None
+		o.bot_player = None
+		o.top_player = None
 
 
 	def get_image(o, card): #create and return an image (maybe store it too? problem, it has to be updated)
@@ -78,8 +79,13 @@ class Displayer(event.Event_listener):
 		cardImage = o.get_image(card)
 		o.screen.blit(cardImage,card.get_position(o))
 
+	def on_board_update_reaction(o, param):
+		#o.update_arena()
+		print(param["battle_manager"].battle_data[-1])
+		return
 
-	def react_enter_arena(o,event, param):
+
+	def react_enter_arena(o,param):
 
 
 		o.bot_player = param["bottom_player"]
@@ -103,7 +109,7 @@ class Displayer(event.Event_listener):
 				o.draw_card(c)
 
 
-	def react_after_summon(o, event, param):
+	def react_after_summon(o, param):
 		o.update_arena()
 	
 	def update_arena(o):
@@ -113,7 +119,7 @@ class Displayer(event.Event_listener):
 		o.screen.blit(o.arena,[0,0])
 		o.update()
 
-	def react_minion_on_attack(o, event, param): # minion = card?????
+	def react_minion_on_attack(o, param): # minion = card?????
 		attacking_minion = param["source_minion"]
 		attacked_minion = param["target_minion"]
 		attacking_minion.get_center(o)			
@@ -124,7 +130,7 @@ class Displayer(event.Event_listener):
 		pg.draw.rect(o.screen, [200, 200, 200], [p[0]-5,p[1]-5,10, 10])
 		o.update()
 			
-	def react_minion_after_attack(o, event, param):
+	def react_minion_after_attack(o, param):
 		o.update_arena()
 			
 			
@@ -136,7 +142,8 @@ class Displayer(event.Event_listener):
 	def quit(o):
 		pg.quit()
 		
-		
+	def __repr__(o):
+		return "battle displayer"
 	
 	
 

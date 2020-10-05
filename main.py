@@ -7,7 +7,7 @@ from random import*
 from card import*
 from sys import exit
 from battle_manager import*
-import event
+import event_manager
 import displayer
 
 
@@ -36,17 +36,18 @@ battle = battle_manager(player1, player2)
 
 
 
-displayer = displayer.Displayer()
+displayer = displayer.Displayer(battle)
 
 battle.attach_displayer(displayer)
-event.Event.battle_manager = battle
+event_manager.battle_manager = battle
 
 winner = battle.simulate_battle()
 if winner != None:
 	print("winner is : " + str(winner))
 else: print("draw")
-print('\n' + "test" + "\n")
-print([str(item) for item in battle.battle_data])
+
+
+
 
 a = True
 while (a):

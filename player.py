@@ -1,5 +1,5 @@
 from random import*
-import event
+import event_manager
 
 class player():
 	
@@ -34,7 +34,7 @@ class player():
 		if (o.count_minion_alive() < 7):
 			o.army_before_resolution.insert(at, card)
 			card.owner = o
-			event.after_summon.fire()
+			event_manager.Event("after_summon").fire()
 
 
 	def count_minion_alive(o):
@@ -53,7 +53,7 @@ class player():
 
 	def __str__(o):
 		res = o.name + ' : '
-		for card in o.army:
+		for card in o.army_before_resolution:
 			res += card.__str__()
 		return res
 
@@ -64,7 +64,7 @@ class player():
 		
 		while (i < len(s.army) and s.army[i].can_attack == False):
 			i += 1
-		if (i == len(s.army)):
+		if (i >= len(s.army)):
 			s.reset_attacks()
 			i = 0
 		while (i < len(s.army) and s.army[i].can_attack == False):
@@ -90,7 +90,16 @@ class player():
 			if crea.attack > 0:
 				crea.can_attack = True
 
-	def set_game_manager(o, game_manager):
+	def set_battle_manager(o, battle_manager):
 		for card in o.army:
-			card.set_game_manager(game_manager)
-		o.game_manager = game_manager
+			card.set_battle_manager(battle_manager)
+		o.game_manager = battle_manager
+
+	def deepcopy(o):
+		res = player(name = o.name)
+		res.army_before_resolution = o.army_before_resolution[:]
+		return res
+
+	def __repr__(o):
+		return o.__str__()
+	

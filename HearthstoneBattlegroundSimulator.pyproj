@@ -35,7 +35,7 @@
     <Compile Include="battle_manager.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="event.py">
+    <Compile Include="event_manager.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="displayer.py">

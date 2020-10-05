@@ -18,9 +18,9 @@ class battle_manager():
 		o.displayer = None
 		o.player1 = player1
 		o.player2 = player2
-		player1.set_game_manager(o)
-		player2.set_game_manager(o)
-		o.save_board_state()
+		player1.set_battle_manager(o)
+		player2.set_battle_manager(o)
+		
 		
 
 
@@ -31,7 +31,7 @@ class battle_manager():
 		
 		if save_battle:
 			battle_data.append(Battle())
-			event.on_update_displayer.battle_manager = o
+			event.on_board_update.battle_manager = o
 
 		done = False
 		winner = None
@@ -39,7 +39,7 @@ class battle_manager():
 		defending_player = o.player2
 		o.player1.army_before_resolution = o.player1.army[:]
 		o.player2.army_before_resolution = o.player2.army[:]
-		event.on_enter_arena.fire({"bottom_player" : o.player1, "top_player" : o.player2})
+		event_manager.Event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2}).fire()
 
 		while (done == False):
 			
@@ -54,6 +54,7 @@ class battle_manager():
 				return attacking_player
 
 			
+			
 			for deathrattle_holder in o.deathrattle_buffer:
 				deathrattle_holder.executeAll()
 			o.deathrattle_buffer = []
@@ -67,17 +68,23 @@ class battle_manager():
 		return winner
 
 	
-	def save_board_state(o):
-		o.battle_data.append(Board_state(o))
+	def save_board_state(o, event):
+		o.battle_data.append(Board_state(o, event))
+	
+	def print_battle_data(o):
+		print([str(item) for item in o.battle_data])
 
+	def __repr__(o):
+		return "battle between " + o.player1.name + " and " + o.player2.name
 
 class Board_state:
-	def __init__(o, battle_manager):
-		o.player1 = copy.deepcopy(battle_manager.player1)
-		o.player2 = copy.deepcopy(battle_manager.player2)
+	def __init__(o, battle_manager, event):
+		o.player1 = battle_manager.player1.deepcopy()
+		o.player2 = battle_manager.player2.deepcopy()
+		o.event = event
 
 	def __str__(o):
-		return o.player1.__str__() + " | " + o.player2.__str__();
+		return "-> event : " + o.event.__str__() + "\n|||Board state ::" + o.player1.__str__() + " | " + o.player2.__str__();
 
 class Battle:
 	def __init__(o):
@@ -86,6 +93,8 @@ class Battle:
 
 	def push(o, board_state_or_event):
 		o.battle_history.append(board_state_or_event)
+
+
 
 
 
