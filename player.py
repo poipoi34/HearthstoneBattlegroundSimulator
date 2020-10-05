@@ -1,10 +1,5 @@
-
-import pygame as pg
-from math import cos,sin,pi,sqrt
-import time
 from random import*
-from card import*
-from sys import exit
+import event
 
 class player():
 	
@@ -39,7 +34,7 @@ class player():
 		if (o.count_minion_alive() < 7):
 			o.army_before_resolution.insert(at, card)
 			card.owner = o
-			event.fire_event(event.Event("after summon",[card]))
+			event.after_summon.fire()
 
 
 	def count_minion_alive(o):
@@ -56,7 +51,11 @@ class player():
 				minion.pos = pos
 				pos +=1
 
-	
+	def __str__(o):
+		res = o.name + ' : '
+		for card in o.army:
+			res += card.__str__()
+		return res
 
 
 	### combat methods
@@ -95,101 +94,3 @@ class player():
 		for card in o.army:
 			card.set_game_manager(game_manager)
 		o.game_manager = game_manager
-
-
-				
-
-class game_manager():
-	def __init__(o):
-		o.deathrattle_buffer = []
-
-	
-	def simulate_fight(o,player1,player2):
-		#player 1 starts the fight
-		done = False
-		winner = None
-		player1.set_game_manager(o)
-		player2.set_game_manager(o)
-		attacking_player = player1
-		defending_player = player2
-		player1.army_before_resolution = player1.army[:]
-		player2.army_before_resolution = player2.army[:]
-		event.fire_event(event.Event("enter arena",[player1,player2]))
-
-		while (done == False):
-			attacking_player.attack(defending_player)
-			attacker_died = len(attacking_player.army) == 0
-			defender_died = len(defending_player.army) == 0
-			if (attacker_died and defender_died):
-				return None
-			if (attacker_died):
-				return defending_player
-			if (defender_died):
-				return attacking_player
-
-			
-			for deathrattle_holder in o.deathrattle_buffer:
-				deathrattle_holder.executeAll()
-			o.deathrattle_buffer = []
-			player1.clear_ghosts()
-			player2.clear_ghosts()
-
-			attacking_player, defending_player = defending_player, attacking_player
-			
-
-
-		return winner
-
-	###event methods
-	def react(s,event):
-		a=0
-			
-"""
-for i in range(100):
-	voidWalker = Card(1,3,name = "void walker")
-	brann = Card(2,4,name = "brann")
-	baron = Card(1,7,name = "baron")
-	magmaRager = Card(5,1,name = "magma rager")
-
-
-	player1 = player(name = "p1")
-	player2 = player(name = "p2")
-
-	player1.add(voidWalker)
-	player1.add(baron)
-
-	player2.add(brann)
-	player2.add(magmaRager)
-
-	g_manager = game_manager()
-	print(g_manager.simulate_fight(player1,player2) == player1)
-
-
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -30,14 +30,11 @@ class Card:
 		###others
 		o.owner = None
 
-	###event methods
-	def react(s,event):
-		a=0
 
 	### combat methods
 	def fight(o,card):
 		#print(s.name, " attacked ",card.name) 
-		event.fire_event(event.Event("on minion attack",[o,card]))
+		event.on_minion_attack.fire({"source_minion" : o, "target_minion" : card})
 		o.take_damage(card)
 		card.take_damage(o)
 		if (o.health <= 0):
@@ -45,27 +42,29 @@ class Card:
 		if (card.health <= 0):
 			card.die()
 		o.can_attack = False
-		event.fire_event(event.Event("after minion attack",[o,card]))
+		event.after_minion_attack.fire({"source_minion" : o, "target_minion" : card})
 		
 	def take_damage(o, card):
 		if (o.divineShield and card.attack > 0):
 			o.divineShield = False
-			event.fire_event(event.Event("divine shield lost",[o]))
+			event.on_divine_shield_lost.fire({"source_minion" : o})
 			return
 		o.health-=card.attack
 
 	def die(o):
-		event.fire_event(event.Event("on minion death",[o]))
+		event.on_minion_death.fire({"source_minion" : o})
 		o.ghost = True
 		if (o.deathrattle_holder != None):
 			o.game_manager.deathrattle_buffer.append(o.deathrattle_holder)
 		o.owner.army.remove(o)
-		event.fire_event(event.Event("after minion death",[o]))
+		event.after_minion_death.fire({"source_minion" : o})
 		
 	
 	def set_game_manager(o, game_manager):
 		o.game_manager = game_manager
 
+	def __str__(o):
+		return "[" + o.name + "/" + str(o.attack) + "/" + str(o.health) + "]"
 	###display methods
 	
 
@@ -90,23 +89,23 @@ class Card:
 
 
 
-class Bolvar(Card, event.Observer):
+class Bolvar(Card, event.Event_listener):
 	def __init__(o):
 		Card.__init__(o, 1, 7, name='Bolvar')
-		event.Observer.__init__(o)
+		event.Event_listener.__init__(o)
 
 		o.divineShield = True
-		def effect(event):
-			if (event.param[0].owner == o.owner):
+		def effect(event, param):
+			if (param["source_minion"].owner == o.owner):
 				o.attack+=2
+				
+		
+		event.find_event("divine shield lost").add_listener(o, effect)
 
-		event.add_subscriber(o, "divine shield lost", effect)
 
-
-class Roi_des_rats(Card,event.Observer):
+class Roi_des_rats(Card):
 	def __init__(o):
 		Card.__init__(o, 3, 2, name = 'roi des rats')
-		#event.Observer.__init__(o)
 		o.deathrattle_holder = deathrattle.Deathrattle(o, [o.deathrattle_effect])
 	
 	def deathrattle_effect(o): #defining deathrattle
@@ -114,7 +113,7 @@ class Roi_des_rats(Card,event.Observer):
 		for i in range(o.attack):
 			o.owner.summon(Rat(),at=o.owner.army_before_resolution.index(o))
 
-class Rat(Card,event.Observer):
+class Rat(Card):
 	def __init__(o):
 		Card.__init__(o,1,1,name = 'rat')
 

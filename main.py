@@ -1,19 +1,20 @@
 
 import pygame as pg
 from math import cos,sin,pi,sqrt
+from player import *
 import time
 from random import*
 from card import*
 from sys import exit
-from basic_bg import*
+from battle_manager import*
 import event
 import displayer
 
 
-voidWalker = Card(1,3,name = "void walker")
+voidWalker = Card(2,3,name = "void walker")
 voidWalker.divineShield = True
 brann = Card(2,4,name = "brann")
-baron = Card(1,7,name = "baron")
+baron = Card(2,7,name = "baron")
 magmaRager = Card(5,1,name = "magma rager")
 bolvar1 = Bolvar()
 bolvar2 = Bolvar()
@@ -31,15 +32,21 @@ player2.add_to_army(brann)
 player2.add_to_army(magmaRager).add_to_army(Roi_des_rats()).add_to_army(bolvar1)
 
 
-g_manager = game_manager()
+battle = battle_manager(player1, player2)
 
 
 
 displayer = displayer.Displayer()
 
+battle.attach_displayer(displayer)
+event.Event.battle_manager = battle
 
-
-print(g_manager.simulate_fight(player1,player2) == player1)
+winner = battle.simulate_battle()
+if winner != None:
+	print("winner is : " + str(winner))
+else: print("draw")
+print('\n' + "test" + "\n")
+print([str(item) for item in battle.battle_data])
 
 a = True
 while (a):
