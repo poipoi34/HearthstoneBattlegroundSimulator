@@ -1,10 +1,10 @@
 from random import*
 import copy
-import event_manager
+from event_manager import *
 
 class player():
 	
-	def __init__(o,*,name = "p"):
+	def __init__(o,*,name = "p", battle_manager = None):
 		
 		#combat attributes
 		o.name = name
@@ -12,7 +12,7 @@ class player():
 		o.army_before_resolution = []
 		o.hand = []
 		o.attacking_indice = 0
-
+		o.battle_manager = battle_manager
 		
 	###event methods
 	def react(s,event):
@@ -35,7 +35,7 @@ class player():
 		if (o.count_minion_alive() < 7):
 			o.army_before_resolution.insert(at, card)
 			card.owner = o
-			event_manager.Event("after_summon").fire()
+			o.battle_manager.event_manager.fire_one_shot_event("after_summon")
 
 
 	def count_minion_alive(o):
@@ -94,7 +94,7 @@ class player():
 	def set_battle_manager(o, battle_manager):
 		for card in o.army:
 			card.set_battle_manager(battle_manager)
-		o.game_manager = battle_manager
+		o.battle_manager = battle_manager
 
 	#copy state of a player to store it in battle history
 	def copy_state(o):

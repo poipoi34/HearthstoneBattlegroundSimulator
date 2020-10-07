@@ -12,14 +12,14 @@ card_width = 75
 card_height = 150
 divine_shield_margin = 5
 
-class Displayer(event_manager.Event_listener):
+class Displayer(event_manager.Listener):
 
 	divineShield = pg.Surface([card_width + divine_shield_margin*2, card_height + divine_shield_margin*2])
 	divineShield.fill(pg.Color(255, 255, 0))
 	divineShield.set_alpha(128)
 	
 	def __init__(o, battle_manager):
-		event_manager.Event_listener.__init__(o)
+		event_manager.Listener.__init__(o)
 		event_manager.add_listener(o, "on_enter_arena", o.react_enter_arena)
 		event_manager.add_listener(o, "on_minion_attack", o.react_minion_on_attack)
 		event_manager.add_listener(o, "after_minion_attack", o.react_minion_after_attack)
@@ -138,6 +138,10 @@ class Displayer(event_manager.Event_listener):
 	def update(o):
 		if (o.display_mode == "arena"):
 			pg.display.flip()
+
+	def display():
+		while True:
+			return
 
 	def quit(o):
 		pg.quit()

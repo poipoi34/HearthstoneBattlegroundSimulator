@@ -40,8 +40,8 @@ player1.add_to_army(voidWalker)
 player2.add_to_army(Roi_des_rats())
 
 
-battle = battle_manager(player1.clone(), player2.clone())
-battle2 = battle_manager(player1.clone(), player2.clone())
+battle = battle_manager(player1, player2)
+battle2 = battle_manager(player1, player2)
 
 
 displayer = displayer.Displayer(battle)

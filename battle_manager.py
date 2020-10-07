@@ -5,6 +5,7 @@ import time
 import copy
 from card import*
 from sys import exit
+from event_manager import *
 
 
 
@@ -16,10 +17,11 @@ class battle_manager():
 		o.deathrattle_buffer = []
 		o.battle_data = []
 		o.displayer = None
-		o.player1 = player1
-		o.player2 = player2
-		player1.set_battle_manager(o)
-		player2.set_battle_manager(o)
+		o.player1 = player1.clone()
+		o.player2 = player2.clone()
+		o.player1.set_battle_manager(o)
+		o.player2.set_battle_manager(o)
+		o.event_manager = event_manager.Event_manager(o)
 		
 		
 
@@ -39,8 +41,8 @@ class battle_manager():
 		defending_player = o.player2
 		o.player1.army_before_resolution = o.player1.army[:]
 		o.player2.army_before_resolution = o.player2.army[:]
-		event_manager.Event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2}).fire()
-
+		o.event_manager.fire_one_shot_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
+		
 		while (done == False):
 			
 			attacking_player.attack(defending_player)

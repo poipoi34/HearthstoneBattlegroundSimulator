@@ -1,7 +1,7 @@
 import pygame as pg
 import copy
 import time
-import event_manager
+from event_manager import *
 import deathrattle
 
 class Card(event_manager.Event_listener):
@@ -37,7 +37,7 @@ class Card(event_manager.Event_listener):
 	### combat methods
 	def fight(o,card):
 		#print(s.name, " attacked ",card.name) 
-		event_manager.Event("on_minion_attack", {"source_minion" : o, "target_minion" : card}).fire()
+		o.battle_manager.event_manager.fire_one_shot_event("on_minion_attack", {"source_minion" : o, "target_minion" : card})
 		o.take_damage(card)
 		card.take_damage(o)
 		if (o.health <= 0):
@@ -45,22 +45,22 @@ class Card(event_manager.Event_listener):
 		if (card.health <= 0):
 			card.die()
 		o.can_attack = False
-		event_manager.Event("after_minion_attack", {"source_minion" : o, "target_minion" : card}).fire()
+		o.battle_manager.event_manager.fire_one_shot_event("after_minion_attack", {"source_minion" : o, "target_minion" : card})
 		
 	def take_damage(o, card):
 		if (o.divineShield and card.attack > 0):
 			o.divineShield = False
-			event_manager.Event("on_divine_shield_lost", {"source_minion" : o}).fire()
+			o.battle_manager.event_manager.fire_one_shot_event("on_divine_shield_lost", {"source_minion" : o})
 			return
 		o.health-=card.attack
 
 	def die(o):
-		event_manager.Event("on_minion_death", {"source_minion" : o}).fire()
+		o.battle_manager.event_manager.one_shot_event("on_minion_death", {"source_minion" : o})
 		o.ghost = True
 		if (o.deathrattle_holder != None):
 			o.battle_manager.deathrattle_buffer.append(o.deathrattle_holder)
 		o.owner.army.remove(o)
-		event_manager.Event("after_minion_death", {"source_minion" : o}).fire()
+		o.battle_managerevent_manager.fire_one_shot_event("after_minion_death", {"source_minion" : o})
 		
 	
 	def set_battle_manager(o, battle_manager):
@@ -105,7 +105,7 @@ class Bolvar(Card):
 				o.attack+=2
 				
 		
-		event_manager.add_listener(o, "on_divine_shield_lost", effect)
+		o.listen_to("on_divine_shield_lost", effect)
 
 
 class Roi_des_rats(Card):
