@@ -3,7 +3,7 @@ import pygame as pg
 from math import cos,sin,pi,sqrt
 import time
 import copy
-from card import*
+from card_definition import*
 from sys import exit
 from event_manager import *
 
@@ -21,19 +21,22 @@ class battle_manager():
 		o.player2 = player2.clone()
 		o.player1.set_battle_manager(o)
 		o.player2.set_battle_manager(o)
-		o.event_manager = event_manager.Event_manager(o)
 		
+		o.event_manager = Event_manager(o)
+		o.player1.register_listerners(o.event_manager)
+		o.player2.register_listerners(o.event_manager)
+		a = 0
 		
 
 
 	def attach_displayer(o, displayer):
 		o.displayer = displayer
-
-	def simulate_battle(o, save_battle = False):
+		o.displayer.set_event_manager(o.event_manager)
 		
-		if save_battle:
-			battle_data.append(Battle())
-			event.on_board_update.battle_manager = o
+
+	def simulate_battle(o, save_battle = True):
+		
+		
 
 		done = False
 		winner = None
@@ -43,12 +46,13 @@ class battle_manager():
 		o.player2.army_before_resolution = o.player2.army[:]
 		o.event_manager.fire_one_shot_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
 		
+		
 		while (done == False):
 			
 			attacking_player.attack(defending_player)
 			
-			for deathrattle_holder in o.deathrattle_buffer:
-				deathrattle_holder.executeAll()
+			for deathrattle in o.deathrattle_buffer:
+				deathrattle()
 			o.deathrattle_buffer = []
 			o.player1.clear_ghosts()
 			o.player2.clear_ghosts()
@@ -85,38 +89,4 @@ class Board_state:
 
 	def __str__(o):
 		return "-> event : " + o.event.__str__() + "\n|||Board state ::" + o.player1.__str__() + " | " + o.player2.__str__();
-
-class Battle:
-	def __init__(o):
-		o.battle_history = []
-		
-
-	def push(o, board_state_or_event):
-		o.battle_history.append(board_state_or_event)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

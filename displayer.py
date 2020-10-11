@@ -3,28 +3,28 @@ import pygame as pg
 from math import cos,sin,pi,sqrt
 import time
 from random import*
-from card import*
+from card_definition import*
 from sys import exit
 from battle_manager import*
-import event_manager
+from event_manager import*
 
 card_width = 75
 card_height = 150
 divine_shield_margin = 5
 
-class Displayer(event_manager.Listener):
+class Displayer(Listener):
 
 	divineShield = pg.Surface([card_width + divine_shield_margin*2, card_height + divine_shield_margin*2])
 	divineShield.fill(pg.Color(255, 255, 0))
 	divineShield.set_alpha(128)
 	
 	def __init__(o, battle_manager):
-		event_manager.Listener.__init__(o)
-		event_manager.add_listener(o, "on_enter_arena", o.react_enter_arena)
-		event_manager.add_listener(o, "on_minion_attack", o.react_minion_on_attack)
-		event_manager.add_listener(o, "after_minion_attack", o.react_minion_after_attack)
-		event_manager.add_listener(o, "after_summon", o.react_after_summon)
-		event_manager.add_listener(o, "on_board_update", o.on_board_update_reaction)
+		Listener.__init__(o)
+		o.listen_to("on_enter_arena", o.react_enter_arena)
+		o.listen_to("on_minion_attack", o.react_minion_on_attack)
+		o.listen_to("after_minion_attack", o.react_minion_after_attack)
+		o.listen_to("after_summon", o.react_after_summon)
+		o.listen_to("on_board_update", o.on_board_update_reaction)
 		
 		pg.init()
 		o.win = [1000,1000]
@@ -46,6 +46,9 @@ class Displayer(event_manager.Listener):
 		o.bot_player = None
 		o.top_player = None
 
+	def set_event_manager(o, event_manager):
+		o.event_manager = event_manager
+		o.event_manager.add_listener(o)
 
 	def get_image(o, card): #create and return an image (maybe store it too? problem, it has to be updated)
 
@@ -80,7 +83,7 @@ class Displayer(event_manager.Listener):
 		o.screen.blit(cardImage,card.get_position(o))
 
 	def on_board_update_reaction(o, param):
-		#o.update_arena()
+		o.update_arena()
 		print(param["battle_manager"].battle_data[-1])
 		return
 
@@ -120,6 +123,7 @@ class Displayer(event_manager.Listener):
 		o.update()
 
 	def react_minion_on_attack(o, param): # minion = card?????
+		o.update_arena()
 		attacking_minion = param["source_minion"]
 		attacked_minion = param["target_minion"]
 		attacking_minion.get_center(o)			

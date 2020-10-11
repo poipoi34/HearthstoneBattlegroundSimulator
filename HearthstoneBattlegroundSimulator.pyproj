@@ -22,6 +22,15 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="buff.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="effect_type.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="setter.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="player.py">
       <SubType>Code</SubType>
     </Compile>
@@ -29,7 +38,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py" />
-    <Compile Include="card.py">
+    <Compile Include="card_definition.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="battle_manager.py">
