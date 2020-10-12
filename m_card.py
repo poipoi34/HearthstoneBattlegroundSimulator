@@ -1,10 +1,11 @@
 import pygame as pg
 import copy
 import time
-from event_manager import *
-from deathrattle import *
-from effect_type import *
-from buff import *
+from m_event import Listener
+from m_deathrattle import Deathrattle
+from m_effect import Effect
+import m_effect
+import m_buff
 
 class Card(Listener):
 	
@@ -46,17 +47,18 @@ class Card(Listener):
 	### combat methods
 	def fight(o,card):
 		#print(s.name, " attacked ",card.name) 
-		o.get_event_manager().fire_one_shot_event("on_minion_attack", {"source_minion" : o, "target_minion" : card})
+		o.get_event_manager().spread_event("on_minion_attack", {"source_minion" : o, "target_minion" : card})
 		o.take_damage(card.attack)
 		card.take_damage(o.attack)
-		o.get_event_manager().fire_one_shot_event("after_minion_attack", {"source_minion" : o, "target_minion" : card})
+		o.get_event_manager().spread_event("after_minion_attack", {"source_minion" : o, "target_minion" : card})
 
 		if (o.health <= 0):
 			o.die()
 		if (card.health <= 0):
 			card.die()
 		o.can_attack = False
-		
+	
+	
 		
 	def take_damage(o, damage):
 		if not o.ghost:
@@ -67,7 +69,7 @@ class Card(Listener):
 			o.health-=damage
 
 	def die(o):
-		o.get_event_manager().fire_one_shot_event("on_minion_death", {"source_minion" : o})
+		o.get_event_manager().spread_event("on_minion_death", {"source_minion" : o})
 		if (o.health <= 0):
 			o.ghost = True
 		if (o.deathrattle_list != []):
@@ -143,20 +145,20 @@ class Bolvar(Card):
 		o.divineShield = True
 
 	
-		o.listen_to("on_divine_shield_lost", lambda o : o.buff(2,0))
+		o.listen_to("on_divine_shield_lost", lambda o,p : o.buff(2,0))
 
 
 class Roi_des_rats(Card):
 	def __init__(o):
 		Card.__init__(o, 3, 2, name = 'roi des rats')
-		effect = E_summon(lambda : Rat(), lambda o : 10, at = o)
+		effect = m_effect.E_summon(lambda : Rat(), lambda o : 10, at = o)
 		
 		o.add_deathrattle(effect)
 		o.add_deathrattle(lambda o : o.buff(0,2))
 		
 		#o.listen_to("on_minion_attack", lambda param : param["source_minion"].buff(0,2))
 		#o.listen_to("on_minion_attack", lambda param : param["target_minion"].buff(0,2))
-		o.listen_to("on_minion_death", lambda param : param["source_minion"].buff(2,2))
+		o.listen_to("on_minion_death", lambda o,param : param["source_minion"].buff(2,2))
 	 
 	def buff2(o):
 		o.buff(2,0)
@@ -175,11 +177,15 @@ class Ghoul(Card):
 		Card.__init__(o, 2, 1, name = 'Ghoul')
 		o.add_deathrattle(Deathrattle(effect_type.deal_aoe_damage(1)))
 
-class MyCard(Card):
+class Scallywag(Card):
 	def __init__(o):
-		o.my_number = 0
-		o.listen_to("on_minion_attack", lambda o : o.my_number + 1)
+		Card.__init__(o, 2, 1, name = 'Scallywag')
+		o.add_deathrattle(m_effect.E_summon(Pirate()))
 
+class Pirate(Card):
+	def __init__(o):
+		Card.__init__(o, 1, 1, name = 'Pirate')
+		o.listen_to("after_summon", lambda o, param : o.owner.command_attack(o) if param["summoned_minion"] == o else None, priorised = True)
 
 	
 

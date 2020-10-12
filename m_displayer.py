@@ -3,10 +3,10 @@ import pygame as pg
 from math import cos,sin,pi,sqrt
 import time
 from random import*
-from card_definition import*
+import m_card
 from sys import exit
-from battle_manager import*
-from event_manager import*
+import m_battle
+from m_event import Listener
 
 card_width = 75
 card_height = 150
@@ -20,7 +20,22 @@ class Displayer(Listener):
 	
 	def __init__(o, battle_manager):
 		Listener.__init__(o)
-		o.listen_to("on_enter_arena", o.react_enter_arena)
+		def react_enter_arena(o, param):
+			o.bot_player = param["bottom_player"]
+			o.top_player = param["top_player"]
+			
+			if (len(o.bot_player.army) < len(o.top_player.army)):
+				o.att_player = o.top_player
+			if (len(o.bot_player.army) > len(o.top_player.army)):
+				o.att_player = o.bot_player
+			else:
+				if (random() < 0.5):
+					o.att_player = o.bot_player
+				else:
+					o.att_player = o.top_player
+
+			o.update_arena()
+		o.listen_to("on_enter_arena", react_enter_arena)
 		o.listen_to("on_minion_attack", o.react_minion_on_attack)
 		o.listen_to("after_minion_attack", o.react_minion_after_attack)
 		o.listen_to("after_summon", o.react_after_summon)
@@ -88,23 +103,7 @@ class Displayer(Listener):
 		return
 
 
-	def react_enter_arena(o,param):
-
-
-		o.bot_player = param["bottom_player"]
-		o.top_player = param["top_player"]
-			
-		if (len(o.bot_player.army) < len(o.top_player.army)):
-			o.att_player = o.top_player
-		if (len(o.bot_player.army) > len(o.top_player.army)):
-			o.att_player = o.bot_player
-		else:
-			if (random() < 0.5):
-				o.att_player = o.bot_player
-			else:
-				o.att_player = o.top_player
-
-		o.update_arena()
+	
 
 	def draw_army(o,player):
 		for c in player.army_before_resolution:

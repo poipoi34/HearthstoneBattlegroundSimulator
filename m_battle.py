@@ -1,11 +1,11 @@
-
+from m_event import Event_manager
 import pygame as pg
 from math import cos,sin,pi,sqrt
 import time
 import copy
-from card_definition import*
+import m_card
 from sys import exit
-from event_manager import *
+import m_event
 
 
 
@@ -19,15 +19,15 @@ class battle_manager():
 		o.displayer = None
 		o.player1 = player1.clone()
 		o.player2 = player2.clone()
+		o.player1.opponent = player2
+		o.player2.opponent = player1
 		o.player1.set_battle_manager(o)
 		o.player2.set_battle_manager(o)
 		
 		o.event_manager = Event_manager(o)
 		o.player1.register_listerners(o.event_manager)
 		o.player2.register_listerners(o.event_manager)
-		a = 0
 		
-
 
 	def attach_displayer(o, displayer):
 		o.displayer = displayer
@@ -35,8 +35,6 @@ class battle_manager():
 		
 
 	def simulate_battle(o, save_battle = True):
-		
-		
 
 		done = False
 		winner = None
@@ -44,15 +42,15 @@ class battle_manager():
 		defending_player = o.player2
 		o.player1.army_before_resolution = o.player1.army[:]
 		o.player2.army_before_resolution = o.player2.army[:]
-		o.event_manager.fire_one_shot_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
-		
+		o.event_manager.spread_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
 		
 		while (done == False):
 			
 			attacking_player.attack(defending_player)
-			
-			for deathrattle in o.deathrattle_buffer:
-				deathrattle()
+			while (event_manager.action_buffer != []):
+				event_manager.release_buffer()
+				for deathrattle in o.deathrattle_buffer:
+					deathrattle()
 			o.deathrattle_buffer = []
 			o.player1.clear_ghosts()
 			o.player2.clear_ghosts()
@@ -67,8 +65,6 @@ class battle_manager():
 				return attacking_player
 			attacking_player, defending_player = defending_player, attacking_player
 			
-
-
 		return winner
 
 	

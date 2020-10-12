@@ -1,14 +1,15 @@
 import threading
 import pygame as pg
 from math import cos,sin,pi,sqrt
-from player import *
+from m_player import Player
+
 import time
 from random import*
-from card_definition import*
+from m_card import *
 from sys import exit
-from battle_manager import*
-import event_manager
-import displayer
+from m_battle import battle_manager
+import m_event
+from m_displayer import Displayer
 
 def pygame_loop():
 	while True:
@@ -32,7 +33,7 @@ cards = [voidWalker,brann,baron,magmaRager, bolvar1, bolvar2]
 player1 = Player(name = "p1")
 player2 = Player(name = "p2")
 
-player1.add_to_army(voidWalker).add_to_army(Rat()).add_to_army(Rat()).add_to_army(Rat()).add_to_army(Rat())
+player1.add_to_army(voidWalker).add_to_army(Scallywag()).add_to_army(Rat()).add_to_army(Rat()).add_to_army(Rat()).add_to_army(Rat())
 #player1.add_to_army(baron).add_to_army(bolvar2)
 
 #player2.add_to_army(brann)
@@ -44,10 +45,11 @@ battle = battle_manager(player1, player2)
 #battle2 = battle_manager(player1, player2)
 
 
-displayer = displayer.Displayer(battle)
+displayer = Displayer(battle)
 
 battle.attach_displayer(displayer)
-event_manager.battle_manager = battle
+
+#event_manager.battle_manager = battle
 #for i in [1,2,3,4,5,6,7,8,9,10]:
 #threading.Thread(target = battle.simulate_battle).start()
 winner = battle.simulate_battle()

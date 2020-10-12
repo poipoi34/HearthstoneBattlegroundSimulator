@@ -1,4 +1,4 @@
-import card_definition
+import m_card
 
 def fct_summon(card, k = 1):
     def effect(source_card):
@@ -16,15 +16,17 @@ def deal_aoe_damage(k):
 
 
 class Effect:
-    def __init__(o, callable_obj, param = {}):
+    def __init__(o, callable_obj, param = {}, instant = True, priorised = False):
         o.callable_obj = callable_obj
         o.param = {}
+        o.priorised = priorised
+        o.instant = instant
         
     def __call__(o):
         o.callable_obj(o.param)
 
 class E_summon(Effect):
-    def __init__(o, card, k,*, callable_obj = None, player_target = None, at = -1, source_card = None):
+    def __init__(o, card, k = 1,*, callable_obj = None, player_target = None, at = -1, source_card = None):
         Effect.__init__(o, callable_obj)
         o.card = card
         o.k =  k

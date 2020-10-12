@@ -1,6 +1,6 @@
 from random import*
 import copy
-from event_manager import *
+
 
 class Player():
 	
@@ -14,6 +14,8 @@ class Player():
 		o.hand = []
 		o.attacking_indice = 0
 		o.battle_manager = battle_manager
+
+		o.opponent = None
 		
 		o.max_army = 7
 		
@@ -39,7 +41,7 @@ class Player():
 			o.army_before_resolution.insert(at, card)
 			card.owner = o
 			card.battle_manager = o.battle_manager
-			o.get_event_manager().fire_one_shot_event("after_summon")
+			o.get_event_manager().fire_one_shot_event("after_summon", {"summoned_minion" : card})
 
 
 	def count_minion_alive(o):
@@ -49,6 +51,7 @@ class Player():
 				size +=1
 		return size
 	
+
 	def update_minion_pos(o):
 		pos = 0
 		for minion in o.army_before_resolution:
@@ -56,11 +59,13 @@ class Player():
 				minion.pos = pos
 				pos +=1
 
+
 	def __str__(o):
 		res = o.name + ' : '
 		for card in o.army_before_resolution:
 			res += card.__str__()
 		return res
+
 
 	def get_taunt_army(o):
 		taunt_army = []
@@ -69,8 +74,23 @@ class Player():
 				taunt_army.append(minion)
 		return taunt_army
 
+
 	### combat methods
-	def attack(o,opponent):
+	def command_attack(o,card,player = None):
+		if player == None:
+			player = o.opponent
+		player_taunt_army = player.get_taunt_army()
+		if player_taunt_army == []:
+			attackedI = randrange(len(player.army))
+			card.fight(player.army[attackedI])
+		else:
+			attackedI = randrange(len(player_taunt_army))
+			card.fight(player_taunt_army[attackedI])
+
+
+	def attack(o,player = None):
+		if player == None:
+			player = o.opponent
 		i = o.attacking_indice
 		
 		while (i < len(o.army) and o.army[i].can_attack == False):
@@ -80,19 +100,13 @@ class Player():
 			i = 0
 		while (i < len(o.army) and o.army[i].can_attack == False):
 			i += 1
-			
-		if (i < len(o.army)):
-			opponent_taunt_army = opponent.get_taunt_army()
-			if opponent_taunt_army == []:
-				attackedI = randrange(len(opponent.army))
-				o.army[i].fight(opponent.army[attackedI])
-			else:
-				attackedI = randrange(len(opponent_taunt_army))
-				o.army[i].fight(opponent_taunt_army[attackedI])
-		else:
+		if i==len(army):
 			raise ValueError("player attack method couldn't find attackant")
 
+		o.command_attack(card[i],player)
+
 		o.attacking_indice = i
+
 
 	def clear_ghosts(o):
 		for minion in o.army_before_resolution:
@@ -101,15 +115,18 @@ class Player():
 
 		o.army = o.army_before_resolution[:]
 
+
 	def reset_attacks(s):
 		for crea in s.army:
 			if crea.attack > 0:
 				crea.can_attack = True
 
+
 	def set_battle_manager(o, battle_manager):
 		for card in o.army:
 			card.set_battle_manager(battle_manager)
 		o.battle_manager = battle_manager
+
 
 	def get_event_manager(o):
 		return o.battle_manager.event_manager

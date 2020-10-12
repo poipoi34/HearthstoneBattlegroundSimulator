@@ -22,38 +22,35 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="buff.py">
+    <Compile Include="m_buff.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="effect_type.py">
+    <Compile Include="m_effect.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="setter.py">
+    <Compile Include="m_setter.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="player.py">
+    <Compile Include="m_player.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="deathrattle.py">
+    <Compile Include="m_deathrattle.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="main.py" />
-    <Compile Include="card_definition.py">
+    <Compile Include="m_card.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="battle_manager.py">
+    <Compile Include="m_battle.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="event_manager.py">
+    <Compile Include="m_event.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="displayer.py">
+    <Compile Include="m_displayer.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="card_look.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="module_de_test.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
