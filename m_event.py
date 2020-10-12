@@ -46,8 +46,6 @@ class Event_manager:
 	def spread_event(o, event_type, param):
 		Event(event_type, param).spread(o)
 
-	def fire_one_shot_event(o, event_type, param = {}):
-		Event(event_type, param, o).fire()
 
 
 class Event:
@@ -69,15 +67,16 @@ class Event:
 			else: event_manager = o.event_manager
 
 		for listener in event_manager.listeners[o.type]:
-			for effect in listener.triggers[o.type]:
-				if effect.instant:
-					polymorphik_call(effect, listener, o.param)
-				else : event_manager.buffer(Action(o, listener, effect))
+			for action in listener.triggers[o.type]:
+				action.event = o
+				if action.instant:
+					action()
+				else : event_manager.buffer(action)
 			
 		time.sleep(0.2)
-		if o.type != "on_board_update" and battle_manager != None and battle_manager.displayer != None:
-			battle_manager.save_board_state(o)
-			Event("on_board_update", {"battle_manager" : battle_manager}).fire(event_manager)
+		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
+			event_manager.battle_manager.save_board_state(o)
+			Event("on_board_update", {"battle_manager" : event_manager.battle_manager}).spread(event_manager)
 		time.sleep(0.2)
 
 		
@@ -90,13 +89,17 @@ class Event:
 
 
 class Action:
-	def __init__(o, listener, effect, event = None, instant = True, priorised = False):
+	def __init__(o, listener, event_callable, event = None, instant = True, priorised = False):
 		o.event = event
 		o.listener = listener
-		o.effect = effect
-	def __call__():
-		polymorphik_call(o, o.listener, event.param)
-		#o.effect(o.listener, o.event.param)
+		o.event_callable = event_callable
+		o.instant = instant
+		o.priorised = priorised
+
+	def __call__(o):
+		#polymorphik_call(o, o.listener, event.param)
+		a = o.event_callable
+		a(o.listener, o.event.param)
 
 # interface listener - implements trigger dictionnary event_type -> list of Trigger
 class Listener:
@@ -104,14 +107,12 @@ class Listener:
 		o.triggers = {}
 		o.event_manager = event_manager
 
-	def listen_to(o, event_type, callable, priorised = False):
+	def listen_to(o, event_type, callable, instant = True, priorised = False):
 		if event_type not in o.triggers:
 			o.triggers[event_type] = []
-		if isinstance(callable, m_effect.Effect):
-			callable.priorised = priorised
-			o.triggers[event_type].append(callable)
-		else : 
-			o.triggers[event_type].append(m_effect.Effect(callable, priorised = priorised))
+
+		o.triggers[event_type].append(Action(o, callable, priorised = priorised, instant = instant))
+
 		if o.event_manager != None:
 			o.event_manager.add_listener(o)
 

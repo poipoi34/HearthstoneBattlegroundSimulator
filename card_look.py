@@ -1,4 +1,3 @@
-
 import pygame as pg
 from math import cos,sin,pi,sqrt
 import time

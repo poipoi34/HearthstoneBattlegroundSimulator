@@ -99,7 +99,7 @@ class Displayer(Listener):
 		cardImage = o.get_image(card)
 		o.screen.blit(cardImage,card.get_position(o))
 
-	def on_board_update_reaction(o, param):
+	def on_board_update_reaction(o, listener, param):
 		o.update_arena()
 		print(param["battle_manager"].battle_data[-1])
 		return
@@ -113,7 +113,7 @@ class Displayer(Listener):
 				o.draw_card(c)
 
 
-	def react_after_summon(o, param):
+	def react_after_summon(o, listener, param):
 		o.update_arena()
 	
 	def update_arena(o):
@@ -123,7 +123,7 @@ class Displayer(Listener):
 		o.screen.blit(o.arena,[0,0])
 		o.update()
 
-	def react_minion_on_attack(o, param): # minion = card?????
+	def react_minion_on_attack(o, listener, param): # minion = card?????
 		o.update_arena()
 		attacking_minion = param["source_minion"]
 		attacked_minion = param["target_minion"]
@@ -135,7 +135,7 @@ class Displayer(Listener):
 		pg.draw.rect(o.screen, [200, 200, 200], [p[0]-5,p[1]-5,10, 10])
 		o.update()
 			
-	def react_minion_after_attack(o, param):
+	def react_minion_after_attack(o, listener, param):
 		o.update_arena()
 			
 			

@@ -9,7 +9,7 @@ class Player():
 
 		###combat attributes
 		o.name = name
-		o.army = []
+		o.army = []#ne pas appeler
 		o.army_before_resolution = []
 		o.hand = []
 		o.attacking_indice = 0
@@ -40,8 +40,9 @@ class Player():
 		if (o.count_minion_alive() < o.max_army):
 			o.army_before_resolution.insert(at, card)
 			card.owner = o
-			card.battle_manager = o.battle_manager
-			o.get_event_manager().fire_one_shot_event("after_summon", {"summoned_minion" : card})
+			card.set_battle_manager(o.battle_manager)
+			card.set_event_manager(o.battle_manager.event_manager)
+			o.get_event_manager().spread_event("after_summon", {"summoned_minion" : card})
 
 
 	def count_minion_alive(o):
@@ -74,6 +75,12 @@ class Player():
 				taunt_army.append(minion)
 		return taunt_army
 
+	def get_army(o):
+		army = []
+		for card in o.army_before_resolution:
+			if not card.ghost:
+				army.append(card)
+		return army
 
 	### combat methods
 	def command_attack(o,card,player = None):
@@ -81,8 +88,10 @@ class Player():
 			player = o.opponent
 		player_taunt_army = player.get_taunt_army()
 		if player_taunt_army == []:
-			attackedI = randrange(len(player.army))
-			card.fight(player.army[attackedI])
+			alive_army = player.get_army()
+
+			attackedI = randrange(len(alive_army))
+			card.fight(alive_army[attackedI])
 		else:
 			attackedI = randrange(len(player_taunt_army))
 			card.fight(player_taunt_army[attackedI])
@@ -100,10 +109,10 @@ class Player():
 			i = 0
 		while (i < len(o.army) and o.army[i].can_attack == False):
 			i += 1
-		if i==len(army):
+		if i==len(o.army):
 			raise ValueError("player attack method couldn't find attackant")
 
-		o.command_attack(card[i],player)
+		o.command_attack(o.army[i],player)
 
 		o.attacking_indice = i
 
@@ -136,6 +145,8 @@ class Player():
 		res = Player(name = o.name)
 		copied_army = []
 		for card in o.army_before_resolution:
+			copied_card = copy.copy(card)
+			copied_card.origine = id(card)
 			copied_army.append(copy.copy(card))
 		res.army_before_resolution = copied_army
 		return res
@@ -155,4 +166,4 @@ class Player():
 	
 	def register_listerners(o, event_manager):
 		for card in o.army:
-			event_manager.add_listener(card)
+			card.set_event_manager(event_manager)

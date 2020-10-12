@@ -18,8 +18,6 @@ def deal_aoe_damage(k):
 class Effect:
     def __init__(o, callable_obj):
         o.callable_obj = callable_obj
-        o.priorised = priorised
-        o.instant = instant
      
     def __call__(o):
         o.callable_obj(o)
@@ -44,10 +42,11 @@ class E_summon(Effect):
         o.resolve_member(source)
         
         for i in range(o.k):
-            if isinstance(o.at, card_definition.Card):
+            if isinstance(o.at, m_card.Card):
                 o.at = o.player_target.army_before_resolution.index(o.at)
-            if not isinstance(o.card, card_definition.Card):
+            if not isinstance(o.card, m_card.Card):
                 card = o.card()
+            else : card = o.card
             o.source.get_player().summon(card, at=o.at)
 
     def resolve_member(o, source):

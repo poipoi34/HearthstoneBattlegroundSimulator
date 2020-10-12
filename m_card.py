@@ -64,7 +64,7 @@ class Card(Listener):
 		if not o.ghost:
 			if (o.divineShield and damage > 0):
 				o.divineShield = False
-				o.battle_manager.event_manager.fire_one_shot_event("on_divine_shield_lost", {"source_minion" : o})
+				o.battle_manager.event_manager.spread_event("on_divine_shield_lost", {"source_minion" : o})
 				return
 			o.health-=damage
 
@@ -74,8 +74,8 @@ class Card(Listener):
 			o.ghost = True
 		if (o.deathrattle_list != []):
 			o.battle_manager.deathrattle_buffer += o.deathrattle_list
-		o.owner.army.remove(o)
-		o.get_event_manager().fire_one_shot_event("after_minion_death", {"source_minion" : o})
+		#o.owner.army_before_resolution.remove(o)
+		o.get_event_manager().spread_event("after_minion_death", {"source_minion" : o})
 		
 	
 	def set_battle_manager(o, battle_manager):
@@ -85,9 +85,14 @@ class Card(Listener):
 
 	def get_event_manager(o):
 		return o.battle_manager.event_manager
+	
+	def set_event_manager(o, event_manager):
+		o.event_manager = event_manager
+		event_manager.add_listener(o)
 
 	def __str__(o):
-		return "[" + o.name + "/" + str(o.attack) + "/" + str(o.health) + "]"
+		b=0
+		return "["+ o.name + "/" + str(o.attack) + "/" + str(o.health) + "/" + str(hex(id(o)))[7:12] + "]"
 	###display methods
 	
 
@@ -113,7 +118,7 @@ class Card(Listener):
 		return [px+25,py+50]
 
 	def __repr__(o):
-		return o.__str__() + str(id(o))
+		return o.__str__()
 
 	def get_player(o):
 		return o.owner
@@ -121,7 +126,7 @@ class Card(Listener):
 	def buff(o, attack_bonus, health_bonus, name = "unnamed"):
 		o.attack += attack_bonus
 		o.health += health_bonus
-		o.buff_list.append(Buff(attack_bonus, health_bonus, name))
+		o.buff_list.append(m_buff.Buff(attack_bonus, health_bonus, name))
 	
 
 	#prend en param un effet et resout toutes les refs
@@ -151,14 +156,14 @@ class Bolvar(Card):
 class Roi_des_rats(Card):
 	def __init__(o):
 		Card.__init__(o, 3, 2, name = 'roi des rats')
-		effect = m_effect.E_summon(lambda : Rat(), lambda o : 10, at = o)
+		effect = m_effect.E_summon(lambda : Rat(), lambda o : o.attack, at = o)
 		
 		o.add_deathrattle(effect)
 		o.add_deathrattle(lambda o : o.buff(0,2))
 		
 		#o.listen_to("on_minion_attack", lambda param : param["source_minion"].buff(0,2))
 		#o.listen_to("on_minion_attack", lambda param : param["target_minion"].buff(0,2))
-		o.listen_to("on_minion_death", lambda o,param : param["source_minion"].buff(2,2))
+		o.listen_to("on_minion_death", lambda o,param : param["source_minion"].buff(2,0))
 	 
 	def buff2(o):
 		o.buff(2,0)
@@ -180,12 +185,13 @@ class Ghoul(Card):
 class Scallywag(Card):
 	def __init__(o):
 		Card.__init__(o, 2, 1, name = 'Scallywag')
-		o.add_deathrattle(m_effect.E_summon(Pirate()))
+		o.add_deathrattle(m_effect.E_summon(lambda : Pirate()))
 
 class Pirate(Card):
 	def __init__(o):
 		Card.__init__(o, 1, 1, name = 'Pirate')
-		o.listen_to("after_summon", lambda o, param : o.owner.command_attack(o) if param["summoned_minion"] == o else None, priorised = True)
+		o.listen_to("after_summon", lambda o, param : o.owner.command_attack(o) if param["summoned_minion"] == o else None)
 
 	
+
 

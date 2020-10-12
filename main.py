@@ -33,7 +33,7 @@ cards = [voidWalker,brann,baron,magmaRager, bolvar1, bolvar2]
 player1 = Player(name = "p1")
 player2 = Player(name = "p2")
 
-player1.add_to_army(voidWalker).add_to_army(Scallywag()).add_to_army(Rat()).add_to_army(Rat()).add_to_army(Rat()).add_to_army(Rat())
+player1.add_to_army(voidWalker).add_to_army(Scallywag())
 #player1.add_to_army(baron).add_to_army(bolvar2)
 
 #player2.add_to_army(brann)
@@ -49,7 +49,6 @@ displayer = Displayer(battle)
 
 battle.attach_displayer(displayer)
 
-#event_manager.battle_manager = battle
 #for i in [1,2,3,4,5,6,7,8,9,10]:
 #threading.Thread(target = battle.simulate_battle).start()
 winner = battle.simulate_battle()

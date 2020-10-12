@@ -19,14 +19,17 @@ class battle_manager():
 		o.displayer = None
 		o.player1 = player1.clone()
 		o.player2 = player2.clone()
-		o.player1.opponent = player2
-		o.player2.opponent = player1
+		o.player1.opponent = o.player2
+		o.player2.opponent = o.player1
 		o.player1.set_battle_manager(o)
 		o.player2.set_battle_manager(o)
 		
 		o.event_manager = Event_manager(o)
+		o.event_manager.battle_manager = o
 		o.player1.register_listerners(o.event_manager)
 		o.player2.register_listerners(o.event_manager)
+
+
 		
 
 	def attach_displayer(o, displayer):
@@ -47,13 +50,17 @@ class battle_manager():
 		while (done == False):
 			
 			attacking_player.attack(defending_player)
-			while (event_manager.action_buffer != []):
-				event_manager.release_buffer()
+			while (o.event_manager.action_buffer != [] or o.deathrattle_buffer != []):
+				o.event_manager.release_buffer()
 				for deathrattle in o.deathrattle_buffer:
 					deathrattle()
-			o.deathrattle_buffer = []
+				o.deathrattle_buffer = []
+				o.player1.clear_ghosts()
+				o.player2.clear_ghosts()
 			o.player1.clear_ghosts()
 			o.player2.clear_ghosts()
+
+
 
 			attacker_died = len(attacking_player.army) == 0
 			defender_died = len(defending_player.army) == 0
