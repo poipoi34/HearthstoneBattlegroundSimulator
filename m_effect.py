@@ -16,14 +16,13 @@ def deal_aoe_damage(k):
 
 
 class Effect:
-    def __init__(o, callable_obj, param = {}, instant = True, priorised = False):
+    def __init__(o, callable_obj):
         o.callable_obj = callable_obj
-        o.param = {}
         o.priorised = priorised
         o.instant = instant
-        
+     
     def __call__(o):
-        o.callable_obj(o.param)
+        o.callable_obj(o)
 
 class E_summon(Effect):
     def __init__(o, card, k = 1,*, callable_obj = None, player_target = None, at = -1, source_card = None):

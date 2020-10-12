@@ -1,3 +1,5 @@
+#
+
 import time
 import warnings
 from inspect import signature
@@ -69,7 +71,7 @@ class Event:
 		for listener in event_manager.listeners[o.type]:
 			for effect in listener.triggers[o.type]:
 				if effect.instant:
-					effect(listener, o.param)
+					polymorphik_call(effect, listener, o.param)
 				else : event_manager.buffer(Action(o, listener, effect))
 			
 		time.sleep(0.2)
@@ -88,12 +90,13 @@ class Event:
 
 
 class Action:
-	def __init__(o, event, listener, effect):
+	def __init__(o, listener, effect, event = None, instant = True, priorised = False):
 		o.event = event
 		o.listener = listener
 		o.effect = effect
 	def __call__():
-		o.effect(o.listener, o.event.param)
+		polymorphik_call(o, o.listener, event.param)
+		#o.effect(o.listener, o.event.param)
 
 # interface listener - implements trigger dictionnary event_type -> list of Trigger
 class Listener:
@@ -107,7 +110,21 @@ class Listener:
 		if isinstance(callable, m_effect.Effect):
 			callable.priorised = priorised
 			o.triggers[event_type].append(callable)
-		else : o.triggers[event_type].append(m_effect.Effect(callable, priorised = priorised))
+		else : 
+			o.triggers[event_type].append(m_effect.Effect(callable, priorised = priorised))
 		if o.event_manager != None:
 			o.event_manager.add_listener(o)
 
+def polymorphik_call(callable, listener, param_event):
+	###un peu de bidouillage
+	
+	inspect_callable_args = signature(callable).parameters
+			
+	if len(inspect_callable_args) == 1:#si le trigger a 1 argument
+		if 'param' in inspect_callable_args:#si param est l'argument
+			callable(param_event)
+		else : callable(listener)#sinon on suppose que le trigger a besoin du listener (?)
+	elif len(inspect_callable_args) == 2:
+		callable(listener, param_event)#on suppose que les args sont dans le bon ordre...
+	else : callable()
+	###fin bidouillage

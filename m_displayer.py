@@ -7,6 +7,8 @@ import m_card
 from sys import exit
 import m_battle
 from m_event import Listener
+from inspect import signature
+
 
 card_width = 75
 card_height = 150
