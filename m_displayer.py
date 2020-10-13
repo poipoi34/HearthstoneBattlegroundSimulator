@@ -1,7 +1,7 @@
 
 import pygame as pg
 from math import cos,sin,pi,sqrt
-import time
+from time import time
 from random import*
 import m_card
 from sys import exit
@@ -13,6 +13,8 @@ from inspect import signature
 card_width = 75
 card_height = 150
 divine_shield_margin = 5
+
+
 
 class Displayer(Listener):
 
@@ -49,6 +51,7 @@ class Displayer(Listener):
 
 		o.display_mode = "arena"
 		###arena
+		o.battle_data = o.battle_manager.battle_data
 		o.arena = pg.Surface(o.win)
 		o.arena.set_colorkey([0,0,0])
 		line_color = [255,0,0]
@@ -137,6 +140,16 @@ class Displayer(Listener):
 			
 	def react_minion_after_attack(o, listener, param):
 		o.update_arena()
+			
+
+	def replay(battle_data):
+		i = 0
+		while True:
+
+			current_animation.jump_frame()
+
+			
+
 			
 			
 	

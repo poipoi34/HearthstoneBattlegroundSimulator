@@ -27,17 +27,12 @@ class Card(Listener):
 		o.ghost = False
 
 		o.taunt = taunt
-		
-		###display attributes
-		o.image = []
 
 		###debug attributes
 		o.name = name
 
 		###others
 		o.owner = None
-
-		o.pos = -1
 
 		###references
 		
@@ -63,9 +58,8 @@ class Card(Listener):
 	def take_damage(o, damage):
 		if not o.ghost:
 			if (o.divineShield and damage > 0):
-				o.divineShield = False
-				o.battle_manager.event_manager.spread_event("on_divine_shield_lost", {"source_minion" : o})
-				return
+				o.divineShield = False	
+				o.battle_manager.event_manager.spread_event("on_divine_shield_lost", {"source_minion" : o})				return
 			o.health-=damage
 
 	def die(o):
@@ -92,7 +86,7 @@ class Card(Listener):
 
 	def __str__(o):
 		b=0
-		return "["+ o.name + "/" + str(o.attack) + "/" + str(o.health) + "/" + str(hex(id(o)))[7:12] + "]"
+		return "["+ o.name + "/" + str(o.attack) + "/" + str(o.health) + "/" + str(hex(id(o)))[7:13] + "]"
 	###display methods
 	
 
@@ -136,7 +130,6 @@ class Card(Listener):
 			effect.source = deathrattle
 		o.deathrattle_list.append(deathrattle)
 
-	
 		
 	
 	

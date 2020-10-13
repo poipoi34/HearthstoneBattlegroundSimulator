@@ -1,5 +1,6 @@
 from random import*
 import copy
+import m_interfaces
 
 
 class Player():
@@ -142,12 +143,11 @@ class Player():
 
 	#copy state of a player to store it in battle history
 	def copy_state(o):
-		res = Player(name = o.name)
+		res = Player(name = "interface of " + o.name)
 		copied_army = []
 		for card in o.army_before_resolution:
-			copied_card = copy.copy(card)
-			copied_card.origine = id(card)
-			copied_army.append(copy.copy(card))
+			copied_army.append(m_interfaces.Card_interface(card))
+
 		res.army_before_resolution = copied_army
 		return res
 	

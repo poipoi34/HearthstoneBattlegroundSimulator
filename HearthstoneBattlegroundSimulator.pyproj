@@ -22,6 +22,15 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="module1.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="m_animation.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="m_interfaces.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="m_buff.py">
       <SubType>Code</SubType>
     </Compile>

@@ -6,6 +6,7 @@ import copy
 import m_card
 from sys import exit
 import m_event
+import m_interfaces
 
 
 
@@ -45,6 +46,9 @@ class battle_manager():
 		defending_player = o.player2
 		o.player1.army_before_resolution = o.player1.army[:]
 		o.player2.army_before_resolution = o.player2.army[:]
+		if o.displayer != None:
+			displayer.replay(o.battle_data)
+
 		o.event_manager.spread_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
 		
 		while (done == False):
