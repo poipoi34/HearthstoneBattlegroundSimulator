@@ -14,7 +14,7 @@ class Card_interface:
 
 		o.name = card.name
 
-		o.owner = card.owner
+		o.owner = card.owner # ~~~ 
 
 		o.id_source = id(card)
 

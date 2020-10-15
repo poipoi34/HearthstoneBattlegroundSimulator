@@ -148,7 +148,7 @@ class Player():
 		for card in o.army_before_resolution:
 			copied_army.append(m_interfaces.Card_interface(card))
 
-		res.army_before_resolution = copied_army
+		res.army_before_resolution = copied_army  
 		return res
 	
 	#clone players so that they can battle to the death for our entertainment

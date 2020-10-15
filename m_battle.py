@@ -7,17 +7,18 @@ import m_card
 from sys import exit
 import m_event
 import m_interfaces
-
+import random
 
 
 class battle_manager():
 
 
 
-	def __init__(o, player1, player2):
+	def __init__(o, player1, player2):#
 		o.deathrattle_buffer = []
 		o.battle_data = []
 		o.displayer = None
+		
 		o.player1 = player1.clone()
 		o.player2 = player2.clone()
 		o.player1.opponent = o.player2
@@ -42,12 +43,13 @@ class battle_manager():
 
 		done = False
 		winner = None
+
 		attacking_player = o.player1
 		defending_player = o.player2
 		o.player1.army_before_resolution = o.player1.army[:]
 		o.player2.army_before_resolution = o.player2.army[:]
-		if o.displayer != None:
-			displayer.replay(o.battle_data)
+		#if o.displayer != None:
+			#o.displayer.display(o.battle_data)
 
 		o.event_manager.spread_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
 		
@@ -75,14 +77,15 @@ class battle_manager():
 			if (defender_died):
 				return attacking_player
 			attacking_player, defending_player = defending_player, attacking_player
-			
+
+		o.event_manager.spread_event("end_of_battle")
 		return winner
 
 	
 	def save_board_state(o, event):
 		o.battle_data.append(Board_state(o, event))
 	
-	def print_battle_data(o):
+	def print_battle_wdata(o):
 		print([str(item) for item in o.battle_data])
 
 	def __repr__(o):

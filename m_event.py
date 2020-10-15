@@ -9,14 +9,16 @@ import m_effect
 class Event_manager:
 	#dictionary of event_type -> list of listener
 	def __init__(o, battle_manager = None):
-		o.listeners = {	"on_enter_arena":[],		#param = []
+		o.listeners = {	"on_enter_arena":[],		#param = [bottom_player, top_player]
+						"before_minion_attack":[],	#param = [attacker,attacked] (obligé, attacked?)
 						"on_minion_attack":[],		#param = [attacker,attacked]
 						"after_minion_attack":[],	#param = [attacker,attacked]
 						"on_divine_shield_lost":[],	#param = [minion]
 						"on_minion_death":[],		#param = [minion,(killer?,type of death?)]
 						"after_minion_death":[],	#param = [minion,(killer?,type of death,owner?)]
 						"after_summon":[],			#param = [minion]
-						"on_board_update":[]		#param = []
+						"on_board_update":[],		#param = []
+						"end_of_battle":[]			#param = []
 			}
 		o.battle_manager = battle_manager
 		o.action_buffer = []
@@ -43,7 +45,7 @@ class Event_manager:
 		for action in o.action_buffer:
 			action()
 
-	def spread_event(o, event_type, param):
+	def spread_event(o, event_type, param = {}):
 		Event(event_type, param).spread(o)
 
 
@@ -73,11 +75,11 @@ class Event:
 					action()
 				else : event_manager.buffer(action)
 			
-		time.sleep(0.2)
+		time.sleep(0.0)
 		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
 			event_manager.battle_manager.save_board_state(o)
 			Event("on_board_update", {"battle_manager" : event_manager.battle_manager}).spread(event_manager)
-		time.sleep(0.2)
+		time.sleep(0.0)
 
 		
 	def __repr__(o):

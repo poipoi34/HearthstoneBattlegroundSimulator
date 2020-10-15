@@ -42,25 +42,29 @@ class Card(Listener):
 	### combat methods
 	def fight(o,card):
 		#print(s.name, " attacked ",card.name) 
-		o.get_event_manager().spread_event("on_minion_attack", {"source_minion" : o, "target_minion" : card})
-		o.take_damage(card.attack)
-		card.take_damage(o.attack)
-		o.get_event_manager().spread_event("after_minion_attack", {"source_minion" : o, "target_minion" : card})
-
+		o.get_event_manager().spread_event("before_minion_attack", {"source_minion" : o,"target_minion" : card})
+		if card.health > 0:
+			o.get_event_manager().spread_event("on_minion_attack", {"source_minion" : o, "target_minion" : card})
+			o.take_damage(card.attack)
+			card.take_damage(o.attack)
+			o.get_event_manager().spread_event("after_minion_attack", {"source_minion" : o, "target_minion" : card})
+			o.can_attack = False
+		
 		if (o.health <= 0):
 			o.die()
 		if (card.health <= 0):
 			card.die()
-		o.can_attack = False
+		
 	
 	
 		
 	def take_damage(o, damage):
-		if not o.ghost:
-			if (o.divineShield and damage > 0):
-				o.divineShield = False	
-				o.battle_manager.event_manager.spread_event("on_divine_shield_lost", {"source_minion" : o})				return
-			o.health-=damage
+		
+		if (o.divineShield and damage > 0):
+			o.divineShield = False	
+			o.battle_manager.event_manager.spread_event("on_divine_shield_lost", {"source_minion" : o})			
+			return
+		o.health-=damage
 
 	def die(o):
 		o.get_event_manager().spread_event("on_minion_death", {"source_minion" : o})
@@ -85,7 +89,6 @@ class Card(Listener):
 		event_manager.add_listener(o)
 
 	def __str__(o):
-		b=0
 		return "["+ o.name + "/" + str(o.attack) + "/" + str(o.health) + "/" + str(hex(id(o)))[7:13] + "]"
 	###display methods
 	
@@ -157,7 +160,7 @@ class Roi_des_rats(Card):
 		#o.listen_to("on_minion_attack", lambda param : param["source_minion"].buff(0,2))
 		#o.listen_to("on_minion_attack", lambda param : param["target_minion"].buff(0,2))
 		o.listen_to("on_minion_death", lambda o,param : param["source_minion"].buff(2,0))
-	 
+
 	def buff2(o):
 		o.buff(2,0)
 	
@@ -179,6 +182,7 @@ class Scallywag(Card):
 	def __init__(o):
 		Card.__init__(o, 2, 1, name = 'Scallywag')
 		o.add_deathrattle(m_effect.E_summon(lambda : Pirate()))
+		o.listen_to("before_minion_attack", lambda o, param: param["target_minion"].take_damage(2))
 
 class Pirate(Card):
 	def __init__(o):

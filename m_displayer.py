@@ -8,7 +8,8 @@ from sys import exit
 import m_battle
 from m_event import Listener
 from inspect import signature
-
+from m_Card_image import Card_image
+import m_animation
 
 card_width = 75
 card_height = 150
@@ -44,6 +45,8 @@ class Displayer(Listener):
 		o.listen_to("after_minion_attack", o.react_minion_after_attack)
 		o.listen_to("after_summon", o.react_after_summon)
 		o.listen_to("on_board_update", o.on_board_update_reaction)
+
+		o.card_to_draw = {} #dictionnaire  id(card) -> la card en question MDR
 		
 		pg.init()
 		o.win = [1000,1000]
@@ -51,7 +54,7 @@ class Displayer(Listener):
 
 		o.display_mode = "arena"
 		###arena
-		o.battle_data = o.battle_manager.battle_data
+		#o.battle_data = o.battle_manager.battle_data
 		o.arena = pg.Surface(o.win)
 		o.arena.set_colorkey([0,0,0])
 		line_color = [255,0,0]
@@ -70,7 +73,7 @@ class Displayer(Listener):
 		o.event_manager = event_manager
 		o.event_manager.add_listener(o)
 
-	def get_image(o, card): #create and return an image (maybe store it too? problem, it has to be updated)
+	def get_image(o, card): ##################################OBSOLETE TO DELETE
 
 		image = pg.Surface([card_width,card_height])
 		image.fill([130,100,255])
@@ -106,8 +109,6 @@ class Displayer(Listener):
 		o.update_arena()
 		print(param["battle_manager"].battle_data[-1])
 		return
-
-
 	
 
 	def draw_army(o,player):
@@ -142,13 +143,42 @@ class Displayer(Listener):
 		o.update_arena()
 			
 
-	def replay(battle_data):
-		i = 0
-		while True:
 
-			current_animation.jump_frame()
+		######## SECOND GENERATION DISPLAYER ########
 
+	def play(o,battle_data):#play a game from a finished written battle_data or a battle_data in writing in a thread
+		end_of_battle = False
+		i = -1
+		while not end_of_battle:
+			if i<len(battle_data)-1:
+				i+=1
+				animation = o.make_animation(battle_data[i]) # switch sur l'event_type pour savoir quel enfant de animation faire
+				finished = False
+				while not finished :
+					finished,changed = animation.update()
+					if changed:
+						o.draw_everything()
+				if battle_data[i].event.type == "end_of_battle":
+					end_of_battle = True
 			
+
+	def draw_everything(o):
+		o.screen.fill([0,0,0])
+		for id_card in o.card_to_draw:
+			card = o.card_to_draw[id_card]
+			o.screen.blit(card.get_image(),card.pos)
+		o.screen.blit(o.arena,[0,0])
+		o.update()
+
+
+
+
+	def make_animation(o,board_state):
+		event_type = board_state.event.type
+		if event_type == "on_enter_arena":
+			return m_animation.on_enter_arena(o,board_state)
+		else:
+			return m_animation.refresh_board_state(o,board_state)
 
 			
 			
@@ -167,6 +197,7 @@ class Displayer(Listener):
 	def __repr__(o):
 		return "battle displayer"
 	
+
 	
 
 
