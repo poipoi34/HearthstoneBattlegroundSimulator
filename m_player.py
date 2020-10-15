@@ -143,13 +143,7 @@ class Player():
 
 	#copy state of a player to store it in battle history
 	def copy_state(o):
-		res = Player(name = "interface of " + o.name)
-		copied_army = []
-		for card in o.army_before_resolution:
-			copied_army.append(m_interfaces.Card_interface(card))
-
-		res.army_before_resolution = copied_army  
-		return res
+		return m_interfaces.Player_interface(o)
 	
 	#clone players so that they can battle to the death for our entertainment
 	def clone(o):

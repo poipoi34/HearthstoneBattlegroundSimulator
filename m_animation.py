@@ -71,7 +71,7 @@ class Animation:
 			raise Exception("some card_image doesn't have an owner")
 		if p_in_army == None:
 			p_in_army = card_image.get_pos_in_army(board_state)# <- definitely need board_state as parameter contrary to place_card()
-		px = o.displayer.win[0]/5 + 3*o.displayer.win[0]/5*p_in_army/len(card_image.owner.army_before_resolution)
+		px = o.displayer.win[0]/5 + 3*o.displayer.win[0]/5*p_in_army/len(card_image.owner.army)
 		card_image.pos = [px,py]
 
 
@@ -89,10 +89,10 @@ class on_enter_arena(Animation):
 		o.last_frame = 60
 			
 		i = 0
-		for card in displayer.bot_player.army_before_resolution:
+		for card in displayer.bot_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[id(card)] = card_image
+				displayer.card_to_draw[card.id_source] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player1
@@ -101,10 +101,10 @@ class on_enter_arena(Animation):
 				i += 1
 
 		i = 0
-		for card in displayer.top_player.army_before_resolution:
+		for card in displayer.top_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[id(card)] = card_image
+				displayer.card_to_draw[card.id_source] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player2
@@ -136,21 +136,21 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 		o.displayer.top_player = board_state.player2
 		displayer.card_to_draw = {}
 		i = 0
-		for card in board_state.player1.army_before_resolution:
+		for card in board_state.player1.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[id(card)] = card_image
+				displayer.card_to_draw[card.id_source] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player1
 				o.place_card(card_image,None,i)
 				i += 1
-
+				
 		i = 0
-		for card in board_state.player2.army_before_resolution:
+		for card in board_state.player2.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[id(card)] = card_image
+				displayer.card_to_draw[card.id_source] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player2

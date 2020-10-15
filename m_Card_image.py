@@ -1,7 +1,9 @@
 import pygame
 
+
 class Card_image:
 	
+	colorkey = [123,21,51]
 
 	def __init__(o,card_interface,displayer = None):
 		o.copy(card_interface)
@@ -60,7 +62,7 @@ class Card_image:
 		#o.image = pygame.Surface([int(o.card.size[0]*s), int(o.card.size[1]*s) ])
 		o.image = pygame.Surface(o.card_size)
 		o.image.fill([130,100,255])
-
+		o.image.set_colorkey(o.colorkey)
 		font = pygame.font.Font('freesansbold.ttf', 20)
 		attack_text = font.render(str(o.attack), True, [0,255,0])
 		h_color = [0,255,0]
@@ -84,7 +86,7 @@ class Card_image:
 				o.divine_shield_margin = 5
 				o.divine_shield_surf = pygame.Surface([card_width + o.divine_shield_margin*2, card_height + o.divine_shield_margin*2])
 				o.divine_shield_surf.fill([255, 255, 0])
-				o.divine_shield_surf.set_colorkey([123,21,51])
+				o.divine_shield_surf.set_colorkey(o.colorkey)
 				o.divine_shield_surf.set_alpha(128)
 			o.divine_shield_surf.blit(o.image,[o.divine_shield_margin, o.divine_shield_margin])
 			return pygame.transform.rotate(scaled(o.divine_shield_surf,o.scale),o.rotation)

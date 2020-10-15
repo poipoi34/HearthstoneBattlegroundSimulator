@@ -4,7 +4,6 @@ class Card_interface:
 		o.health = card.health
 		o.max_attack = card.max_attack
 		o.max_health = card.max_health
-
 		o.divineShield= card.divineShield
 		o.deathrattle_list = card.deathrattle_list[:]
 		o.buff_list = card.buff_list[:]
@@ -24,3 +23,11 @@ class Card_interface:
 	def __repr__(o):
 		return o.__str__()
 
+class Player_interface:
+	def __init__(o, player):
+		o.name = "interface of " + player.name
+		o.army = []
+		for card in player.army_before_resolution:
+			card_interface = Card_interface(card)
+			card_interface.owner = o
+			o.army.append(card_interface)
