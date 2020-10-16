@@ -143,7 +143,7 @@ class Displayer(Listener):
 		o.update_arena()
 			
 
-
+		
 		######## SECOND GENERATION DISPLAYER ########
 
 	def play(o,battle_data):#play a game from a finished written battle_data or a battle_data in writing in a thread

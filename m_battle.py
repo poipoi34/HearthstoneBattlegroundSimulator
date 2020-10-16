@@ -8,7 +8,7 @@ from sys import exit
 import m_event
 import m_interfaces
 import random
-
+import json
 
 class battle_manager():
 
@@ -53,7 +53,7 @@ class battle_manager():
 
 		o.event_manager.spread_event("on_enter_arena", {"bottom_player" : o.player1, "top_player" : o.player2})
 		
-		while (done == False):
+		while not done:
 			
 			attacking_player.attack(defending_player)
 			while (o.event_manager.action_buffer != [] or o.deathrattle_buffer != []):
@@ -71,14 +71,18 @@ class battle_manager():
 			attacker_died = len(attacking_player.army) == 0
 			defender_died = len(defending_player.army) == 0
 			if (attacker_died and defender_died):
-				return None
+				winner = None
+				done = True
 			if (attacker_died):
-				return defending_player
+				winner = defending_player
+				done = True
 			if (defender_died):
-				return attacking_player
+				winner = attacking_player
+				done = True
 			attacking_player, defending_player = defending_player, attacking_player
 
 		o.event_manager.spread_event("end_of_battle")
+
 		return winner
 
 	
