@@ -68,18 +68,22 @@ class Event:
 				raise Exception("No event_manager defined for event : " + o.type)
 			else: event_manager = o.event_manager
 
+		
+		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
+			event_manager.battle_manager.save_board_state(o)
+		time.sleep(0.05)
+
 		for listener in event_manager.listeners[o.type]:
 			for action in listener.triggers[o.type]:
 				action.event = o
 				if action.instant:
 					action()
 				else : event_manager.buffer(action)
-			
-		time.sleep(0.0)
+
 		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
-			event_manager.battle_manager.save_board_state(o)
 			Event("on_board_update", {"battle_manager" : event_manager.battle_manager}).spread(event_manager)
-		time.sleep(0.0)
+			
+		time.sleep(0.05)
 
 		
 	def __repr__(o):
