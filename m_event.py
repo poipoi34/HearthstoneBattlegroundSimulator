@@ -10,9 +10,9 @@ class Event_manager:
 	#dictionary of event_type -> list of listener
 	def __init__(o, battle_manager = None):
 		o.listeners = {	"on_enter_arena":[],		#param = [bottom_player, top_player]
-						"before_minion_attack":[],	#param = [attacker,attacked] (obligé, attacked?)
-						"on_minion_attack":[],		#param = [attacker,attacked]
-						"after_minion_attack":[],	#param = [attacker,attacked]
+						"before_minion_attack":[],	#param = ["source_minion","target_minion"] (obligé, attacked?)
+						"on_minion_attack":[],		#param = ["source_minion","target_minion"]
+						"after_minion_attack":[],	#param = ["source_minion","target_minion"]
 						"on_divine_shield_lost":[],	#param = [minion]
 						"on_minion_death":[],		#param = [minion,(killer?,type of death?)]
 						"after_minion_death":[],	#param = [minion,(killer?,type of death,owner?)]
