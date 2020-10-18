@@ -52,6 +52,13 @@ class Player_interface:
 			card_interface.owner = o
 			o.army.append(card_interface)
 
+	def get_army_without_ghost(o):
+		army_without_ghost = []
+		for card in o.army:
+			if not card.ghost:
+				army_without_ghost.append(card)
+		return army_without_ghost
+
 	def encode_json(o):
 		return {
 			"id" : id(o),
@@ -67,6 +74,8 @@ class Player_interface:
 		for card in o.army:
 			str += card.__str__()
 		return str
+	def method_max(o):
+		pass
 
 	def get_army_without_ghost(o):
 		army_without_ghost = []
