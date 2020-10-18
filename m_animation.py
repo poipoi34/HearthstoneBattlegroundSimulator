@@ -69,14 +69,14 @@ class Animation:
 	def get_card_placement(o,card_image,board_state,p_in_army = None):
 		px,py = 0,0
 		if (card_image.owner == o.displayer.top_player):
-			py = o.displayer.win[1]*1/4
+			py = o.displayer.win[1]*(1/4+1/8)
 		elif(card_image.owner == o.displayer.bot_player):
-			py = o.displayer.win[1]*2/4
+			py = o.displayer.win[1]*(2/4+1/8)
 		else:
 			raise Exception("some card_image doesn't have an owner")
 		if p_in_army == None:
 			p_in_army = card_image.get_pos_in_army(board_state)# <- definitely need board_state as parameter contrary to place_card()
-		px = o.displayer.win[0]/5 + 3*o.displayer.win[0]/5*p_in_army/len(card_image.owner.army)
+		px = o.displayer.win[0]/5 + 3*o.displayer.win[0]/5*((p_in_army+1)/(len(card_image.owner.get_army_without_ghost())+1))
 		return [px,py]
 
 class on_enter_arena(Animation):

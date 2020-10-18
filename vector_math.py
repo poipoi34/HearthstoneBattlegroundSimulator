@@ -12,3 +12,4 @@ def sub(u,v):
 	for i in range(len(u)):
 		res[i] = u[i] - v[i]
 	return res
+

@@ -71,7 +71,7 @@ class Event:
 		
 		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
 			event_manager.battle_manager.save_board_state(o)
-		time.sleep(0.05)
+		time.sleep(0.0)
 
 		for listener in event_manager.listeners[o.type]:
 			for action in listener.triggers[o.type]:
@@ -83,7 +83,7 @@ class Event:
 		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
 			Event("on_board_update", {"battle_manager" : event_manager.battle_manager}).spread(event_manager)
 			
-		time.sleep(0.05)
+		time.sleep(0.0)
 
 		
 	def __repr__(o):
