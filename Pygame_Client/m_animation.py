@@ -23,6 +23,7 @@ class Chrono:
 	def rewind(ms):
 		o.start_time - ms
 
+
 #une animation est lié à une liste de animated_object et s'occupe de les bouger
 #la class Animation est abstraite
 class Animation:
@@ -85,8 +86,8 @@ class on_enter_arena(Animation):
 		Animation.__init__(o,displayer,board_state)
 		displayer.event = board_state.event # ? à quoi ça sert?
 
-		displayer.bot_player = board_state.player1
-		displayer.top_player = board_state.player2
+		displayer.bot_player = board_state.bottom_player
+		displayer.top_player = board_state.top_player
 
 		o.last_frame = 60
 			
@@ -94,10 +95,10 @@ class on_enter_arena(Animation):
 		for card in displayer.bot_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.object_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
-				card_image.owner = board_state.player1
+				card_image.owner = board_state.bottom_player
 				card_image.scale = 0
 				o.place_card(card_image,None,i)
 				i += 1
@@ -106,10 +107,10 @@ class on_enter_arena(Animation):
 		for card in displayer.top_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.object_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
-				card_image.owner = board_state.player2
+				card_image.owner = board_state.top_player
 				card_image.scale = 0
 				o.place_card(card_image,None,i)
 				i += 1
@@ -117,14 +118,14 @@ class on_enter_arena(Animation):
 	def update_animation(o):
 
 		if o.current_frame >= o.last_frame:
-			for id_card in o.displayer.card_to_draw:
-				card = o.displayer.card_to_draw[id_card]
+			for id_card in o.displayer.object_to_draw:
+				card = o.displayer.object_to_draw[id_card]
 				card.rotation = 0
 				card.scale = 1
 
 		if o.current_frame >= 0:
-			for id_card in o.displayer.card_to_draw:
-				card = o.displayer.card_to_draw[id_card]
+			for id_card in o.displayer.object_to_draw:
+				card = o.displayer.object_to_draw[id_card]
 				card.scale = o.current_frame/o.last_frame
 				card.rotation = 360 * o.current_frame/o.last_frame
 
@@ -133,28 +134,28 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		o.displayer.bot_player = o.board_state.player1
-		o.displayer.top_player = o.board_state.player2
-		displayer.card_to_draw = {}
+		o.displayer.bot_player = o.board_state.bottom_player
+		o.displayer.top_player = o.board_state.top_player
+		displayer.object_to_draw = {}
 		i = 0
-		for card in board_state.player1.army:
+		for card in board_state.bottom_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.object_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
-				card_image.owner = board_state.player1
+				card_image.owner = board_state.bottom_player
 				o.place_card(card_image,None,i)
 				i += 1
 				
 		i = 0
-		for card in board_state.player2.army:
+		for card in board_state.top_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.object_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
-				card_image.owner = board_state.player2
+				card_image.owner = board_state.top_player
 				o.place_card(card_image,None,i)
 				i += 1
 		t=0
@@ -167,7 +168,7 @@ class before_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		o.object_to_animate.append(displayer.card_to_draw[id(board_state.event.param["source_minion"])])
+		o.object_to_animate.append(displayer.object_to_draw[board_state.event.param["source_minion"]])
 
 	def update_animation(o):
 		o.object_to_animate[0].scale = 1 + o.current_frame/o.last_frame*0.3
@@ -176,8 +177,8 @@ class on_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		o.object_to_animate.append(displayer.card_to_draw[id(board_state.event.param["source_minion"])])
-		o.object_to_animate.append(displayer.card_to_draw[id(board_state.event.param["target_minion"])])
+		o.object_to_animate.append(displayer.object_to_draw[board_state.event.param["source_minion"]])
+		o.object_to_animate.append(displayer.object_to_draw[board_state.event.param["target_minion"]])
 
 		source_minion = o.object_to_animate[0]
 		target_minion = o.object_to_animate[1]
@@ -194,8 +195,8 @@ class after_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		attacker_id = id(board_state.event.param["source_minion"])
-		o.attacker_image = displayer.card_to_draw[attacker_id]
+		attacker_id = board_state.event.param["source_minion"]
+		o.attacker_image = displayer.object_to_draw[attacker_id]
 		o.back_pos = o.get_card_placement(o.attacker_image,board_state)
 		o.starting_pos = o.attacker_image.pos[:]
 

@@ -16,10 +16,10 @@ class Card_interface:
 
 		o.owner = card.owner # ~~~ 
 
-		o.id_source = id(card)
+		o.id = id(card)
 
 	def __str__(o):
-		return "["+ o.name + "/" + str(o.attack) + "/" + str(o.health) + "/" + str(hex(o.id_source))[7:13] + "]"
+		return "["+ o.name + "/" + str(o.attack) + "/" + str(o.health) + "/" + str(hex(o.id))[7:13] + "]"
 
 	def __repr__(o):
 		return o.__str__()
@@ -27,7 +27,7 @@ class Card_interface:
 	#return dict
 	def encode_json(o):
 		return {
-			"id" : id(o),
+			"id" : o.id,
 			"name" : o.name,
 			"attack" : o.attack,
 			"health" : o.health,
@@ -45,6 +45,7 @@ class Card_interface:
 
 class Player_interface:
 	def __init__(o, player):
+		o.id = id(player)
 		o.name = "interface of " + player.name
 		o.army = []
 		for card in player.army_before_resolution:
@@ -61,7 +62,7 @@ class Player_interface:
 
 	def encode_json(o):
 		return {
-			"id" : id(o),
+			"id" : o.id,
 			"name" : o.name,
 			"army" : [i_card.encode_json() for i_card in o.army]
 			}
@@ -86,6 +87,7 @@ class Player_interface:
 
 class Event_interface:
 	def __init__(o, event):
+		o.id = id(event)
 		o.type = event.type
 		o.param = {}
 		for key in event.param:
@@ -96,7 +98,7 @@ class Event_interface:
 
 	def encode_json(o):
 		return {
-			"id" : id(o),
+			"id" : o.id,
 			"type" : o.type,
 			"param" : o.param
 			}
@@ -105,5 +107,3 @@ class Event_interface:
 		return o.__str__()
 	def __str__(o):
 		return "event " + o.type + " with param : " + str(o.param)
-	def method_sacha(o):
-		pass

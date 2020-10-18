@@ -2,10 +2,10 @@ import pygame as pg
 from math import cos,sin,pi,sqrt
 from time import time
 from random import*
-import m_card
+
 from sys import exit
 from inspect import signature
-from m_Card_image import Card_image
+from m_card_image import Card_image
 import m_animation
 
 card_width = 75
@@ -14,40 +14,19 @@ divine_shield_margin = 5
 
 
 
-class Displayer(Listener):
+class Displayer:
 
-	divineShield = pg.Surface([card_width + divine_shield_margin*2, card_height + divine_shield_margin*2])
-	divineShield.fill(pg.Color(255, 255, 0))
-	divineShield.set_alpha(128)
+	divine_shield = pg.Surface([card_width + divine_shield_margin*2, card_height + divine_shield_margin*2])
+	divine_shield.fill(pg.Color(255, 255, 0))
+	divine_shield.set_alpha(128)
 	
 	def __init__(o, battle_manager):
-		Listener.__init__(o)
-		def react_enter_arena(o, param):
-			o.bot_player = param["bottom_player"]
-			o.top_player = param["top_player"]
-			
-			if (len(o.bot_player.army) < len(o.top_player.army)):
-				o.att_player = o.top_player
-			if (len(o.bot_player.army) > len(o.top_player.army)):
-				o.att_player = o.bot_player
-			else:
-				if (random() < 0.5):
-					o.att_player = o.bot_player
-				else:
-					o.att_player = o.top_player
-
-			o.update_arena()
-		o.listen_to("on_enter_arena", react_enter_arena)
-		o.listen_to("on_minion_attack", o.react_minion_on_attack)
-		o.listen_to("after_minion_attack", o.react_minion_after_attack)
-		o.listen_to("after_summon", o.react_after_summon)
-		o.listen_to("on_board_update", o.on_board_update_reaction)
-
-		o.card_to_draw = {} #dictionnaire  id(card) -> la card en question
-		
 		pg.init()
 		o.win = [1000,1000]
 		o.screen = pg.display.set_mode(o.win)
+		o.battle_manager = battle_manager
+		o.object_to_draw = {}
+
 
 		o.display_mode = "arena"
 		###arena
@@ -60,15 +39,6 @@ class Displayer(Listener):
 		for i in range(4):
 			pg.draw.line(o.arena,line_color,[0,o.win[1]*i/4],[o.win[0],o.win[1]*i/4])
 
-		###players
-		o.att_player = None
-		o.def_player = None
-		o.bot_player = None
-		o.top_player = None
-
-	def set_event_manager(o, event_manager):
-		o.event_manager = event_manager
-		o.event_manager.add_listener(o)
 
 	def get_image(o, card): ##################################OBSOLETE TO DELETE
 
@@ -92,9 +62,9 @@ class Displayer(Listener):
 		image.blit(health_text,blitPosH)
 
 
-		if (card.divineShield):
-			o.divineShield.blit(image, [5,5])
-			return o.divineShield
+		if (card.divine_shield):
+			o.divine_shield.blit(image, [5,5])
+			return o.divine_shield
 
 		return image
 
@@ -102,10 +72,6 @@ class Displayer(Listener):
 		cardImage = o.get_image(card)
 		o.screen.blit(cardImage,card.get_position(o))
 
-	def on_board_update_reaction(o, listener, param):
-		o.update_arena()
-		print(param["battle_manager"].battle_data[-1])
-		return
 	
 
 	def draw_army(o,player):
@@ -165,8 +131,8 @@ class Displayer(Listener):
 
 	def draw_everything(o):
 		o.screen.fill([0,0,0])
-		for id_card in o.card_to_draw:
-			card = o.card_to_draw[id_card]
+		for id_card in o.object_to_draw:
+			card = o.object_to_draw[id_card]
 			pos = []
 			o.screen.blit(card.get_image(),[card.pos[0]-card.card_size[0]/2,card.pos[1]-card.card_size[1]/2])
 		o.screen.blit(o.arena,[0,0])

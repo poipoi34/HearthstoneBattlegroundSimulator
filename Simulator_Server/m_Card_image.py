@@ -38,19 +38,19 @@ class Card_image:
 
 		#o.owner = card_interface.owner
 
-		o.id_source = card_interface.id_source
+		o.id = card_interface.id
 
 
 	def get_pos_in_army(o,battle_data):
 		i = 0
 		for card_from_game in battle_data.player1.army:
-			if o.id_source == card_from_game.id_source:
+			if o.id == card_from_game.id:
 				return i
 			if card_from_game.ghost == False:
 				i += 1
 		i = 0
 		for card_from_game in battle_data.player2.army:
-			if o.id_source == card_from_game.id_source:
+			if o.id == card_from_game.id:
 				return i
 			if card_from_game.ghost == False:
 				i += 1

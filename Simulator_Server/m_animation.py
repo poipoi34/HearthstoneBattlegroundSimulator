@@ -94,7 +94,7 @@ class on_enter_arena(Animation):
 		for card in displayer.bot_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.card_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player1
@@ -106,7 +106,7 @@ class on_enter_arena(Animation):
 		for card in displayer.top_player.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.card_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player2
@@ -140,7 +140,7 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 		for card in board_state.player1.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.card_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player1
@@ -151,7 +151,7 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 		for card in board_state.player2.army:
 			if not card.ghost:
 				card_image = Card_image(card)
-				displayer.card_to_draw[card.id_source] = card_image
+				displayer.card_to_draw[card.id] = card_image
 				o.object_to_animate.append(card_image)
 				card_image.pos_in_army = i
 				card_image.owner = board_state.player2

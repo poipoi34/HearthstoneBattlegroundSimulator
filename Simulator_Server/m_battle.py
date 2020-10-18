@@ -115,5 +115,5 @@ class Board_state:
 			"id" : id(o),
 			"bottom_player" : o.player1.encode_json(),
 			"top_player" : o.player2.encode_json(),
-			"event" : o.event.type
+			"event" : o.event.encode_json()
 			}

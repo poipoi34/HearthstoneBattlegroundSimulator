@@ -2,12 +2,12 @@
 import pygame
 
 
-class Card_image:
+class Card_image():
 	
 	colorkey = [123,21,51]
 
-	def __init__(o,card_interface,displayer = None):
-		o.copy(card_interface)
+	def __init__(o, card_interface, displayer = None):
+		o.data = card_interface
 
 		o.image = []#potentialy store image data, for now get_image() always calculate it
 		o.displayer = displayer
@@ -22,36 +22,19 @@ class Card_image:
 
 		
 
-	def copy(o,card_interface):
-		o.attack = card_interface.attack
-		o.health = card_interface.health
-		o.max_attack = card_interface.max_attack
-		o.max_health = card_interface.max_health
-
-		o.divineShield= card_interface.divineShield
-		o.deathrattle_list = card_interface.deathrattle_list[:]
-		o.buff_list = card_interface.buff_list[:]
-		o.ghost = card_interface.ghost
-
-		o.taunt = card_interface.taunt
-
-		o.name = card_interface.name
-
-		#o.owner = card_interface.owner
-
-		o.id_source = card_interface.id_source
 
 
-	def get_pos_in_army(o,battle_data):
+
+	def get_pos_in_army(o, battle_data):
 		i = 0
-		for card_from_game in battle_data.player1.army:
-			if o.id_source == card_from_game.id_source:
+		for card_from_game in battle_data.bottom_player.army:
+			if o.data.id == card_from_game.id:
 				return i
 			if card_from_game.ghost == False:
 				i += 1
 		i = 0
-		for card_from_game in battle_data.player2.army:
-			if o.id_source == card_from_game.id_source:
+		for card_from_game in battle_data.top_player.army:
+			if o.data.id == card_from_game.id:
 				return i
 			if card_from_game.ghost == False:
 				i += 1
@@ -66,11 +49,11 @@ class Card_image:
 		o.image.fill([130,100,255])
 		o.image.set_colorkey(o.colorkey)
 		font = pygame.font.Font('freesansbold.ttf', 20)
-		attack_text = font.render(str(o.attack), True, [0,255,0])
+		attack_text = font.render(str(o.data.attack), True, [0,255,0])
 		h_color = [0,255,0]
-		if (o.health < o.max_health):
+		if (o.data.health < o.data.max_health):
 			h_color = [255,0,0]
-		health_text = font.render(str(o.health), True, h_color)
+		health_text = font.render(str(o.data.health), True, h_color)
 
 		att_surface = attack_text.get_rect()
 		hlth_surface = health_text.get_rect()
@@ -82,7 +65,7 @@ class Card_image:
 		o.image.blit(health_text,blitPosH)
 
 		return_surf = o.image #should copy
-		if (o.divineShield):
+		if (o.data.divine_shield):
 			if (o.divine_shield_surf == None):
 				card_width,card_height = o.card_size[0],o.card_size[1]
 				o.divine_shield_margin = 5

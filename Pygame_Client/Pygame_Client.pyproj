@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>87dfc272-ad18-46ca-8be1-31833eb197bf</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Pygame_Client.py</StartupFile>
+    <StartupFile>main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,6 +21,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="vector_math.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="m_battle.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="main.py" />
     <Compile Include="m_animation.py">
       <SubType>Code</SubType>
     </Compile>
@@ -33,7 +40,6 @@
     <Compile Include="m_interfaces.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Pygame_Client.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
