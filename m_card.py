@@ -182,7 +182,7 @@ class Scallywag(Card):
 	def __init__(o):
 		Card.__init__(o, 2, 1, name = 'Scallywag')
 		o.add_deathrattle(m_effect.E_summon(lambda : Pirate()))
-		o.listen_to("before_minion_attack", lambda o, param: param["target_minion"].take_damage(2))
+		o.listen_to("before_minion_attack", lambda o, param: param["target_minion"].take_damage(0))
 
 class Pirate(Card):
 	def __init__(o):

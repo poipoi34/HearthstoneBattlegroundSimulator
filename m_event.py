@@ -75,11 +75,11 @@ class Event:
 					action()
 				else : event_manager.buffer(action)
 			
-		time.sleep(0.0)
+		time.sleep(0.5)
 		if o.type != "on_board_update" and event_manager.battle_manager != None and event_manager.battle_manager.displayer != None:
 			event_manager.battle_manager.save_board_state(o)
 			Event("on_board_update", {"battle_manager" : event_manager.battle_manager}).spread(event_manager)
-		time.sleep(0.0)
+		time.sleep(0.5)
 
 		
 	def __repr__(o):

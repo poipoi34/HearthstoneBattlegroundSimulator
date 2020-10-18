@@ -23,6 +23,25 @@ class Card_interface:
 	def __repr__(o):
 		return o.__str__()
 
+	#return dict
+	def encode_json(o):
+		return {
+			"id" : id(o),
+			"name" : o.name,
+			"attack" : o.attack,
+			"health" : o.health,
+			"max_attack" : o.max_attack,
+			"max_health" : o.max_health,
+			"divine_shield" : o.divineShield,
+			"ghost" : o.ghost,
+			"taunt" : o.taunt,
+			"owner" : id(o.owner)
+			}
+		##todo##
+		#ajouter deathrattle list
+		#ajouter buff list
+		
+
 class Player_interface:
 	def __init__(o, player):
 		o.name = "interface of " + player.name
@@ -31,3 +50,19 @@ class Player_interface:
 			card_interface = Card_interface(card)
 			card_interface.owner = o
 			o.army.append(card_interface)
+
+	def encode_json(o):
+		return {
+			"id" : id(o),
+			"name" : o.name,
+			"army" : [i_card.encode_json() for i_card in o.army]
+			}
+
+	def __str__(o):
+		return o.__repr__()
+
+	def __repr__(o):
+		str = o.name + ' : '
+		for card in o.army:
+			str += card.__str__()
+		return str
