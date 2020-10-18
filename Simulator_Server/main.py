@@ -58,6 +58,7 @@ print("battle_data:")
 for i in battle.battle_data:
 	print(str(i))
 
+
 displayer.play(battle.battle_data)
 
 

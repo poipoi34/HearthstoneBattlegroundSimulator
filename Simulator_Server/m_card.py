@@ -64,6 +64,7 @@ class Card(Listener):
 			o.divineShield = False	
 			o.battle_manager.event_manager.spread_event("on_divine_shield_lost", {"source_minion" : o})			
 			return
+		o.battle_manager.event_manager.spread_event("on_take_damage", {"target_minion" : o, "damage":damage} )	
 		o.health-=damage
 
 	def die(o):
