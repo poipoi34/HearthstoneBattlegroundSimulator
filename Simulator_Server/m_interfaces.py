@@ -73,3 +73,5 @@ class Player_interface:
 		for card in o.army:
 			str += card.__str__()
 		return str
+	def method_max(o):
+		pass
