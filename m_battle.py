@@ -16,7 +16,7 @@ class battle_manager():
 
 	def __init__(o, player1, player2):#
 		o.deathrattle_buffer = []
-		o.battle_data = []
+		o.battle_data = []#list of board_state
 		o.displayer = None
 		
 		o.player1 = player1.clone()
@@ -80,9 +80,10 @@ class battle_manager():
 				winner = attacking_player
 				done = True
 			attacking_player, defending_player = defending_player, attacking_player
-
 		o.event_manager.spread_event("end_of_battle")
 
+		with open('data.txt', 'w') as outfile:
+			json.dump(o.encode_json(), outfile)
 		return winner
 
 	
@@ -95,6 +96,11 @@ class battle_manager():
 	def __repr__(o):
 		return "battle between " + o.player1.name + " and " + o.player2.name
 
+	def encode_json(o):
+		return {
+			"data" : [board_state.encode_json() for board_state in o.battle_data]
+			}
+
 class Board_state:
 	def __init__(o, battle_manager, event):
 		o.player1 = battle_manager.player1.copy_state()
@@ -104,3 +110,10 @@ class Board_state:
 	def __str__(o):
 		return "-> event : " + o.event.__str__() + "\n|||Board state ::" + o.player1.__str__() + " | " + o.player2.__str__();
 
+	def encode_json(o):
+		return {
+			"id" : id(o),
+			"bottom_player" : o.player1.encode_json(),
+			"top_player" : o.player2.encode_json(),
+			"event" : o.event.type
+			}

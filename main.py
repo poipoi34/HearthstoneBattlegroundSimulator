@@ -33,12 +33,12 @@ cards = [voidWalker,brann,baron,magmaRager, bolvar1, bolvar2]
 player1 = Player(name = "p1")
 player2 = Player(name = "p2")
 
-player1.add_to_army(voidWalker).add_to_army(Scallywag())
+player1.add_to_army(Scallywag()).add_to_army(Scallywag())
 #player1.add_to_army(baron).add_to_army(bolvar2)
 
 #player2.add_to_army(brann)
 #player2.add_to_army(magmaRager).add_to_army(Roi_des_rats()).add_to_army(bolvar1)
-player2.add_to_army(Roi_des_rats())
+player2.add_to_army(Roi_des_rats()).add_to_army(Roi_des_rats())
 
 
 battle = battle_manager(player1, player2)

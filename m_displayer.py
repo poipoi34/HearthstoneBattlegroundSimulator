@@ -160,7 +160,11 @@ class Displayer(Listener):
 						o.draw_everything()
 				if battle_data[i].event.type == "end_of_battle":
 					end_of_battle = True
-			
+
+			##pygame loop
+			for event in pg.event.get():
+				if event.type == pg.QUIT:
+					displayer.quit()
 
 	def draw_everything(o):
 		o.screen.fill([0,0,0])
