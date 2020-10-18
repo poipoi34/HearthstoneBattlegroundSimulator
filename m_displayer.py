@@ -46,7 +46,7 @@ class Displayer(Listener):
 		o.listen_to("after_summon", o.react_after_summon)
 		o.listen_to("on_board_update", o.on_board_update_reaction)
 
-		o.card_to_draw = {} #dictionnaire  id(card) -> la card en question MDR
+		o.card_to_draw = {} #dictionnaire  id(card) -> la card en question
 		
 		pg.init()
 		o.win = [1000,1000]
@@ -170,7 +170,8 @@ class Displayer(Listener):
 		o.screen.fill([0,0,0])
 		for id_card in o.card_to_draw:
 			card = o.card_to_draw[id_card]
-			o.screen.blit(card.get_image(),card.pos)
+			pos = []
+			o.screen.blit(card.get_image(),[card.pos[0]-card.card_size[0]/2,card.pos[1]-card.card_size[1]/2])
 		o.screen.blit(o.arena,[0,0])
 		o.update()
 

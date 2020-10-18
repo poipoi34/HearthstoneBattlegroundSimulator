@@ -11,7 +11,8 @@ class Card_image:
 		o.image = []#potentialy store image data, for now get_image() always calculate it
 		o.displayer = displayer
 
-		o.pos = [0,0] #pixel pos
+		o.pos = [0,0] #pixel pos of center
+		o.drawing_pos = [0,0] #wierd thing just to draw the rotated surf at good position
 		o.card_size = [75,150] #width,height
 		o.scale = 1
 		o.rotation = 0
@@ -79,7 +80,7 @@ class Card_image:
 		o.image.blit(attack_text,blitPosA)
 		o.image.blit(health_text,blitPosH)
 
-
+		return_surf = o.image #should copy
 		if (o.divineShield):
 			if (o.divine_shield_surf == None):
 				card_width,card_height = o.card_size[0],o.card_size[1]
@@ -89,20 +90,16 @@ class Card_image:
 				o.divine_shield_surf.set_colorkey(o.colorkey)
 				o.divine_shield_surf.set_alpha(128)
 			o.divine_shield_surf.blit(o.image,[o.divine_shield_margin, o.divine_shield_margin])
-			return pygame.transform.rotate(scaled(o.divine_shield_surf,o.scale),o.rotation)
+			return_surf = o.divine_shield_surf #should copy
 
 
-		return pygame.transform.rotate(scaled(o.image,o.scale),o.rotation)
+		rotate(scaled(return_surf,o.scale),o.rotation,o.pos)
 
-	def get_center(o):
-		return [o.pos[0] + o.scale*o.card_size[0],o.pos[1] + o.scale*o.card_size[1]]
+		return return_surf
 
 
 	def rotate(angle):# you can also set the rotation directly throught attribut rotation
 		o.rotation += angle
-
-
-	
 
 	def draw(o,displayer):
 		displayer.screen.blit(o.get_image(),o.pos)
@@ -113,3 +110,8 @@ def scaled(surf,scale):
 	dim = surf.get_size()
 	dim = [int(dim[0]*scale),int(dim[1]*scale)]
 	return pygame.transform.smoothscale(surf,dim)
+
+def rotate(surf,angle,pos):#rotate a surface and return the shift to apply (translation) to make the turn centered at center of surface
+	size = surf.get_size()[:]
+	pygame.transform.rotate(surf,angle)
+	return [-size[0] + surf.get_width(),-size[1] + surf.get_height()]
