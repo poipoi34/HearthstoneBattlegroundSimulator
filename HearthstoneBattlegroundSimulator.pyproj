@@ -63,6 +63,7 @@
     <Compile Include="card_look.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="vector_math.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="README.txt" />

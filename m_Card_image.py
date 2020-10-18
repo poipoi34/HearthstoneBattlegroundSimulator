@@ -42,18 +42,18 @@ class Card_image:
 
 	def get_pos_in_army(o,battle_data):
 		i = 0
-		for card_from_game in battle_data.player1.army_before_resolution:
+		for card_from_game in battle_data.player1.army:
 			if o.id_source == card_from_game.id_source:
 				return i
 			if card_from_game.ghost == False:
 				i += 1
 		i = 0
-		for card_from_game in battle_data.player2.army_before_resolution:
-			if o.id_source == card_from_game:
+		for card_from_game in battle_data.player2.army:
+			if o.id_source == card_from_game.id_source:
 				return i
 			if card_from_game.ghost == False:
 				i += 1
-		raise ("didn't find the card in army")
+		raise Exception("didn't find the card in army")
 
 	def get_image(o): #create and return an image
 		
@@ -94,6 +94,8 @@ class Card_image:
 
 		return pygame.transform.rotate(scaled(o.image,o.scale),o.rotation)
 
+	def get_center(o):
+		return [o.pos[0] + o.scale*o.card_size[0],o.pos[1] + o.scale*o.card_size[1]]
 
 
 	def rotate(angle):# you can also set the rotation directly throught attribut rotation

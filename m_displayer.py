@@ -180,7 +180,13 @@ class Displayer(Listener):
 	def make_animation(o,board_state):
 		event_type = board_state.event.type
 		if event_type == "on_enter_arena":
-			return m_animation.on_enter_arena(o,board_state)
+			return m_animation.on_enter_arena(o,board_state) 
+		if event_type == "before_minion_attack":
+			return m_animation.before_minion_attack(o,board_state) 
+		if event_type == "on_minion_attack":
+			return m_animation.on_minion_attack(o,board_state) 
+		if event_type == "after_minion_attack":
+			return m_animation.after_minion_attack(o,board_state) 
 		else:
 			return m_animation.refresh_board_state(o,board_state)
 

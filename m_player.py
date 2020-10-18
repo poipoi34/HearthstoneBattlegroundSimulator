@@ -88,8 +88,10 @@ class Player():
 		if player == None:
 			player = o.opponent
 		player_taunt_army = player.get_taunt_army()
-		if player_taunt_army == []:
+		if player_taunt_army == [] :
 			alive_army = player.get_army()
+			if (alive_army == []):
+				return
 
 			attackedI = randrange(len(alive_army))
 			card.fight(alive_army[attackedI])
