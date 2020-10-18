@@ -241,7 +241,7 @@ class on_take_damage(Animation):
 		rect_text.center = [r,r]
 
 		o.circle.blit(text,rect_text)
-		o.circle.draw_pos = rect_circle
+		#o.circle.draw_pos = rect_circle
 		
 		displayer.card_to_draw[id(o.circle)] = o.circle
 

@@ -188,8 +188,6 @@ class Displayer(Listener):
 			return m_animation.on_minion_attack(o,board_state) 
 		if event_type == "after_minion_attack":
 			return m_animation.after_minion_attack(o,board_state) 
-		if event_type == "on_take_damage":
-			return m_animation.on_take_damage(o,board_state) 
 		else:
 			return m_animation.refresh_board_state(o,board_state)
 

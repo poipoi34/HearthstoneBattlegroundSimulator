@@ -77,16 +77,18 @@ class Card_image():
 			return_surf = o.divine_shield_surf #should copy
 
 
-		rotate(scaled(return_surf,o.scale),o.rotation,o.pos)
-
+		return_surf = rotate(scaled(return_surf,o.scale),o.rotation,o.pos)
+		o.draw_pos = [o.pos[0]-return_surf.get_size()[0]/2,o.pos[1]-return_surf.get_size()[1]/2]
 		return return_surf
 
 
-	def rotate(angle):# you can also set the rotation directly throught attribut rotation
+
+	def rotate(o, angle):# you can also set the rotation directly throught attribut rotation
 		o.rotation += angle
 
 	def draw(o,displayer):
 		displayer.screen.blit(o.get_image(),o.pos)
+
 
 
 
@@ -97,5 +99,4 @@ def scaled(surf,scale):
 
 def rotate(surf,angle,pos):#rotate a surface and return the shift to apply (translation) to make the turn centered at center of surface
 	size = surf.get_size()[:]
-	pygame.transform.rotate(surf,angle)
-	return [-size[0] + surf.get_width(),-size[1] + surf.get_height()]
+	return pygame.transform.rotate(surf,angle)

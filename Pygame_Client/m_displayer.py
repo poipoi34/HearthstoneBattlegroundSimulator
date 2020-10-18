@@ -134,7 +134,7 @@ class Displayer:
 		for id_card in o.object_to_draw:
 			card = o.object_to_draw[id_card]
 			pos = []
-			o.screen.blit(card.get_image(),[card.pos[0]-card.card_size[0]/2,card.pos[1]-card.card_size[1]/2])
+			o.screen.blit(card.get_image(),card.draw_pos)
 		o.screen.blit(o.arena,[0,0])
 		o.update()
 
