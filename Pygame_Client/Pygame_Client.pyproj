@@ -21,6 +21,18 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="m_animation.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="m_card_image.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="m_displayer.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="m_interfaces.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Pygame_Client.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

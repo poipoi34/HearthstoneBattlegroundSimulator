@@ -1,4 +1,3 @@
-import time
 class Card_interface:
 	def __init__(o,card):
 		o.attack = card.attack
@@ -74,27 +73,3 @@ class Player_interface:
 			if not card.ghost:
 				army_without_ghost.append(card)
 		return army_without_ghost
-
-class Event_interface:
-	def __init__(o, event):
-		o.type = event.type
-		o.param = {}
-		for key in event.param:
-			if hasattr(event.param[key], "__dict__"):#if it's a class
-				o.param[key] = id(event.param[key])
-			else : o.param[key] = event.param[key]
-		
-
-	def encode_json(o):
-		return {
-			"id" : id(o),
-			"type" : o.type,
-			"param" : o.param
-			}
-
-	def __repr__(o):
-		return o.__str__()
-	def __str__(o):
-		return "event " + o.type + " with param : " + str(o.param)
-	def method_sacha(o):
-		pass

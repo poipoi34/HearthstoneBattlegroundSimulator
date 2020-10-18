@@ -1,5 +1,5 @@
 from time import time
-from m_Card_image import Card_image
+from m_card_image import Card_image
 import math
 from vector_math import *
 
@@ -167,7 +167,7 @@ class before_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		o.object_to_animate.append(displayer.card_to_draw[board_state.event.param["source_minion"]])
+		o.object_to_animate.append(displayer.card_to_draw[id(board_state.event.param["source_minion"])])
 
 	def update_animation(o):
 		o.object_to_animate[0].scale = 1 + o.current_frame/o.last_frame*0.3
@@ -176,8 +176,8 @@ class on_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		o.object_to_animate.append(displayer.card_to_draw[board_state.event.param["source_minion"]])
-		o.object_to_animate.append(displayer.card_to_draw[board_state.event.param["target_minion"]])
+		o.object_to_animate.append(displayer.card_to_draw[id(board_state.event.param["source_minion"])])
+		o.object_to_animate.append(displayer.card_to_draw[id(board_state.event.param["target_minion"])])
 
 		source_minion = o.object_to_animate[0]
 		target_minion = o.object_to_animate[1]
@@ -194,7 +194,7 @@ class after_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
-		attacker_id = board_state.event.param["source_minion"]
+		attacker_id = id(board_state.event.param["source_minion"])
 		o.attacker_image = displayer.card_to_draw[attacker_id]
 		o.back_pos = o.get_card_placement(o.attacker_image,board_state)
 		o.starting_pos = o.attacker_image.pos[:]

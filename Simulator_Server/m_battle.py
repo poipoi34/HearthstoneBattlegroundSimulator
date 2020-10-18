@@ -103,9 +103,9 @@ class battle_manager():
 
 class Board_state:
 	def __init__(o, battle_manager, event):
-		o.player1 = battle_manager.player1.copy_state()
-		o.player2 = battle_manager.player2.copy_state()
-		o.event = event
+		o.player1 = m_interfaces.Player_interface(battle_manager.player1)
+		o.player2 = m_interfaces.Player_interface(battle_manager.player2)
+		o.event = m_interfaces.Event_interface(event)
 
 	def __str__(o):
 		return "-> event : " + o.event.__str__() + "\n|||Board state ::" + o.player1.__str__() + " | " + o.player2.__str__();
