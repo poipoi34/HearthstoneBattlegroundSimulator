@@ -12,7 +12,7 @@ class Card_image:
 		o.displayer = displayer
 
 		o.pos = [0,0] #pixel pos of center
-		o.drawing_pos = [0,0] #wierd thing just to draw the rotated surf at good position
+		o.draw_pos = [0,0] #wierd thing just to draw the rotated surf at good position
 		o.card_size = [75,150] #width,height
 		o.scale = 1
 		o.rotation = 0
@@ -93,8 +93,8 @@ class Card_image:
 			return_surf = o.divine_shield_surf #should copy
 
 
-		rotate(scaled(return_surf,o.scale),o.rotation,o.pos)
-
+		return_surf = rotate(scaled(return_surf,o.scale),o.rotation,o.pos)
+		o.draw_pos = [o.pos[0]-return_surf.get_size()[0]/2,o.pos[1]-return_surf.get_size()[1]/2]
 		return return_surf
 
 
@@ -113,5 +113,4 @@ def scaled(surf,scale):
 
 def rotate(surf,angle,pos):#rotate a surface and return the shift to apply (translation) to make the turn centered at center of surface
 	size = surf.get_size()[:]
-	pygame.transform.rotate(surf,angle)
-	return [-size[0] + surf.get_width(),-size[1] + surf.get_height()]
+	return pygame.transform.rotate(surf,angle)

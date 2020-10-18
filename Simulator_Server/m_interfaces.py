@@ -74,8 +74,6 @@ class Player_interface:
 		for card in o.army:
 			str += card.__str__()
 		return str
-	def method_max(o):
-		pass
 
 	def get_army_without_ghost(o):
 		army_without_ghost = []
@@ -105,5 +103,3 @@ class Event_interface:
 		return o.__str__()
 	def __str__(o):
 		return "event " + o.type + " with param : " + str(o.param)
-	def method_sacha(o):
-		pass

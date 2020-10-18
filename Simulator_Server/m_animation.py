@@ -2,6 +2,7 @@ from time import time
 from m_Card_image import Card_image
 import math
 from vector_math import *
+import pygame
 
 class Chrono:
 	def __init__(o):
@@ -116,17 +117,20 @@ class on_enter_arena(Animation):
 
 	def update_animation(o):
 
-		if o.current_frame >= o.last_frame:
+		if o.current_frame <= o.last_frame//2:
+			for id_card in o.displayer.card_to_draw:
+				card = o.displayer.card_to_draw[id_card]
+				card.rotation = 360 * o.current_frame/(o.last_frame//2)
+
+		if o.current_frame > o.last_frame//2:
 			for id_card in o.displayer.card_to_draw:
 				card = o.displayer.card_to_draw[id_card]
 				card.rotation = 0
-				card.scale = 1
 
-		if o.current_frame >= 0:
-			for id_card in o.displayer.card_to_draw:
-				card = o.displayer.card_to_draw[id_card]
-				card.scale = o.current_frame/o.last_frame
-				card.rotation = 360 * o.current_frame/o.last_frame
+		t = o.current_frame/o.last_frame
+		for id_card in o.displayer.card_to_draw:
+			card = o.displayer.card_to_draw[id_card]
+			card.scale = -2*t*t+3*t
 
 class refresh_board_state(Animation):# le but de cette animation est de dessiner le board state, en ignorant l'event
 
@@ -185,19 +189,26 @@ class on_minion_attack(Animation):
 
 	def update_animation(o):
 		t = o.current_frame/o.last_frame
-		#f(0) = 0, f(1) = 1 et f(t) = at² - t
-		#a = 2 
-		#p(t) = f(t)*(v-u) + u avec u = o.u et v = o.object_to_animate[1]
-		o.object_to_animate[0].pos = add ( mul((2*t*t - t),sub(o.object_to_animate[1].pos,o.u)), o.u)
+		#f(0) = 0, f(1) = 3/4 et f(t) = at² - t
+		#a = 7/4
+		#p(t) = (1-f(t))*u + f(t)*v avec u = o.u et v = o.object_to_animate[1].pos
+		o.object_to_animate[0].pos = add ( mul((1-7/4*t*t+t),o.u), mul((7/4*t*t-t),o.object_to_animate[1].pos) )
 
 class after_minion_attack(Animation):
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 30
+
 		attacker_id = board_state.event.param["source_minion"]
+		attacked_id = board_state.event.param["target_minion"]
 		o.attacker_image = displayer.card_to_draw[attacker_id]
+		o.target_image = displayer.card_to_draw[attacked_id]
+
+		o.object_to_animate = [o.attacker_image,o.target_image]
 		o.back_pos = o.get_card_placement(o.attacker_image,board_state)
 		o.starting_pos = o.attacker_image.pos[:]
+
+		o.initial_target_pos = o.target_image.pos[:]
 
 	def update_animation(o):
 		t = o.current_frame/o.last_frame
@@ -205,8 +216,41 @@ class after_minion_attack(Animation):
 		u = o.starting_pos
 		v = o.back_pos
 		o.attacker_image.pos = add( mul(t,v) , mul(1-t,u))
+		t = o.current_frame/o.last_frame
+		o.target_image.pos[0] = o.initial_target_pos[0] + 5*math.cos(6*math.pi*t)
 		
+class on_take_damage(Animation):
+	def __init__(o,displayer,board_state):
+		Animation.__init__(o,displayer,board_state)
+		o.last_frame = 20
 
+		r = 20
+
+		font = pygame.font.Font('freesansbold.ttf', 20)
+
+		text = font.render(str(-board_state.event.param["damage"]), True, [255,255,0])
+		target_minion = displayer.card_to_draw[board_state.event.param["target_minion"]]
+
+		o.circle = pygame.Surface([2*r,2*r])
+		o.circle.set_colorkey([0,0,0])
+		pygame.draw.circle(o.circle,[255,0,0],[r,r],r)
+
+		rect_text = text.get_rect()
+		rect_circle = o.circle.get_rect()
+		rect_circle.center = [target_minion.pos[0] + 37,target_minion.pos[1] + 74]
+		rect_text.center = [r,r]
+
+		o.circle.blit(text,rect_text)
+		o.circle.draw_pos = rect_circle
+		
+		displayer.card_to_draw[id(o.circle)] = o.circle
+
+	def update_animation(o):
+		if o.current_frame >= o.last_frame:
+			displayer.card_to_draw.pop(id(o.circle), None)
+
+
+		
 
 
 #création d'une animation: 

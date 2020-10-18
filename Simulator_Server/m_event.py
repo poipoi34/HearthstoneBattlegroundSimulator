@@ -9,7 +9,7 @@ import m_effect
 class Event_manager:
 	#dictionary of event_type -> list of listener
 	def __init__(o, battle_manager = None):
-		o.listeners = {	"on_enter_arena":[],		#param = [bottom_player, top_player]
+		o.listeners = {	"on_enter_arena":[],		#param = ["bottom_player", "top_player"]
 						"before_minion_attack":[],	#param = ["source_minion","target_minion"] (obligé, attacked?)
 						"on_minion_attack":[],		#param = ["source_minion","target_minion"]
 						"after_minion_attack":[],	#param = ["source_minion","target_minion"]
@@ -18,7 +18,8 @@ class Event_manager:
 						"after_minion_death":[],	#param = [minion,(killer?,type of death,owner?)]
 						"after_summon":[],			#param = [minion]
 						"on_board_update":[],		#param = []
-						"end_of_battle":[]			#param = []
+						"end_of_battle":[],			#param = []
+						"on_take_damage":[]			#param = ["target_player","damage"]
 			}
 		o.battle_manager = battle_manager
 		o.action_buffer = []
