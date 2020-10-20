@@ -1,12 +1,33 @@
-
+import math
+from vector_math import *
 import pygame
-class Card_image():
-	
+
+class Drawable():
+	def __init__(o,image = None):
+		o.__draw_pos = Vector([0,0])
+		o.pos = Vector([0,0]) #center
+		o.image = []
+		o.transformed_image = [] # after rotation + scale
+		#storing both image and transformed_image because transform of pygame change quality of image
+		o.rotation = 0
+		o.scale = 0
+
+	def get_draw_pos(o):
+		a = Vector(o.transformed_image.get_size())
+		b = 0
+
+		return o.pos - 0.5*Vector(o.transformed_image.get_size())
+
+
+
+class Card_image(Drawable):
+		
 	colorkey = [123,21,51]
 
 	def __init__(o, card_interface, displayer = None):
+		Drawable.__init__(o)
 		o.data = card_interface
-
+		
 		o.image = []#potentialy store image data, for now get_image() always calculate it
 		o.displayer = displayer
 
@@ -57,7 +78,7 @@ class Card_image():
 		o.image.blit(attack_text,blitPosA)
 		o.image.blit(health_text,blitPosH)
 
-		return_surf = o.image #should copy
+		o.transformed_image = o.image #should copy
 		if (o.data.divine_shield):
 			if (o.divine_shield_surf == None):
 				card_width,card_height = o.card_size[0],o.card_size[1]
@@ -67,12 +88,11 @@ class Card_image():
 				o.divine_shield_surf.set_colorkey(o.colorkey)
 				o.divine_shield_surf.set_alpha(128)
 			o.divine_shield_surf.blit(o.image,[o.divine_shield_margin, o.divine_shield_margin])
-			return_surf = o.divine_shield_surf #should copy
+			o.transformed_image = o.divine_shield_surf #should copy
 
 
-		return_surf = rotate(scaled(return_surf,o.scale),o.rotation,o.pos)
-		o.draw_pos = [o.pos[0]-return_surf.get_size()[0]/2,o.pos[1]-return_surf.get_size()[1]/2]
-		return return_surf
+		o.transformed_image = o.rotate(o.scaled(o.transformed_image,o.scale),o.rotation,o.pos)
+		return o.transformed_image
 
 
 
@@ -85,11 +105,18 @@ class Card_image():
 
 
 
-def scaled(surf,scale):
-	dim = surf.get_size()
-	dim = [int(dim[0]*scale),int(dim[1]*scale)]
-	return pygame.transform.smoothscale(surf,dim)
+	def scaled(o,surf,scale):
+		dim = surf.get_size()
+		dim = [int(dim[0]*scale),int(dim[1]*scale)]
+		return pygame.transform.smoothscale(surf,dim)
 
-def rotate(surf,angle,pos):#rotate a surface and return the shift to apply (translation) to make the turn centered at center of surface
-	size = surf.get_size()[:]
-	return pygame.transform.rotate(surf,angle)
+	def rotate(o,surf,angle,pos):#rotate a surface and return the shift to apply (translation) to make the turn centered at center of surface
+		size = surf.get_size()[:]
+		return pygame.transform.rotate(surf,angle)
+
+
+
+
+
+
+

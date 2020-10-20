@@ -21,6 +21,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="m_object.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="vector_math.py">
       <SubType>Code</SubType>
     </Compile>
