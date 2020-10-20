@@ -23,7 +23,7 @@ class Displayer:
 		o.battle_manager = battle_manager
 
 		o.game_object = {}
-		o.displayer_object = {}
+		o.displayer_object = []
 
 
 		o.display_mode = "arena"
@@ -61,9 +61,10 @@ class Displayer:
 		o.screen.fill([0,0,0])
 		for id_card in o.game_object:
 			card = o.game_object[id_card]
-			pos = []
-			o.screen.blit(card.get_image(),card.get_draw_pos())
+			o.screen.blit(card.get_transformed_image(),card.get_draw_pos())
 		o.screen.blit(o.arena,[0,0])
+		for display_object in o.displayer_object:
+			o.screen.blit(display_object.get_transformed_image(),display_object.get_draw_pos())
 		o.update()
 
 
@@ -77,6 +78,8 @@ class Displayer:
 			return m_animation.on_minion_attack(o,board_state) 
 		if event_type == "after_minion_attack":
 			return m_animation.after_minion_attack(o,board_state) 
+		if event_type == "on_take_damage":
+			return m_animation.on_take_damage(o,board_state)
 		else:
 			return m_animation.refresh_board_state(o,board_state)
 

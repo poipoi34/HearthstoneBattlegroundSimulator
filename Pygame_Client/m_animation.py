@@ -69,19 +69,42 @@ class Animation:
 	
 	def get_card_placement(o,card_image,board_state,p_in_army = None):
 		px,py = 0,0
-		if (card_image.owner == o.displayer.top_player):
-			py = o.displayer.win[1]*(1/4+1/8)
-		elif(card_image.owner == o.displayer.bot_player):
-			py = o.displayer.win[1]*(2/4+1/8)
-		else:
-			raise Exception("some card_image doesn't have an owner")
+		m = o.displayer.win[0]
+		n_cards = len(card_image.owner.get_army_without_ghost())
 		if p_in_army == None:
 			p_in_army = card_image.get_pos_in_army(board_state)# <- definitely need board_state as parameter contrary to place_card()
-		px = o.displayer.win[0]/5 + 3*o.displayer.win[0]/5*((p_in_army+1)/(len(card_image.owner.get_army_without_ghost())+1))
-		return Vector([px,py])
+		c = Card_image.card_size[0] + 10
+		k = 7 #number of cards in a row
 
-	def refresh(player):
-		pass
+		if (card_image.owner == o.displayer.top_player):
+			if n_cards <= k:
+				py = o.displayer.win[1]*(1/4+1/8)
+			elif n_cards > k:
+				py = o.displayer.win[1]*(1/4+(1+p_in_army//k)*1/12)
+		elif(card_image.owner == o.displayer.bot_player):
+			if n_cards <= k:
+				py = o.displayer.win[1]*(2/4+1/8)
+			elif n_cards > k:
+				py = o.displayer.win[1]*(2/4+(1+p_in_army//k)*1/12)
+		else:
+			raise Exception("some card_image doesn't have an owner")	
+		
+		s = n_cards%k if p_in_army//k == n_cards//k else k
+		px = m/2 - c*(s-1)/2 + (p_in_army%k)*c
+		#px = m/5 + 3*m/5*((p_in_army+1)/(n_cards+1))
+		return Vector(px,py)
+
+	def refresh(o,player):
+		i = 0
+		for card in player.army:
+			if not card.ghost:
+				card_image = Card_image(card)
+				o.displayer.game_object[card.id] = card_image
+				o.object_to_animate.append(card_image)
+				card_image.pos_in_army = i
+				card_image.owner = player
+				o.place_card(card_image,None,i)
+				i += 1
 
 class on_enter_arena(Animation):
 
@@ -94,29 +117,8 @@ class on_enter_arena(Animation):
 
 		o.last_frame = 60
 			
-		i = 0
-		for card in displayer.bot_player.army:
-			if not card.ghost:
-				card_image = Card_image(card)
-				displayer.game_object[card.id] = card_image
-				o.object_to_animate.append(card_image)
-				card_image.pos_in_army = i
-				card_image.owner = board_state.bottom_player
-				card_image.scale = 0
-				o.place_card(card_image,None,i)
-				i += 1
-
-		i = 0
-		for card in displayer.top_player.army:
-			if not card.ghost:
-				card_image = Card_image(card)
-				displayer.game_object[card.id] = card_image
-				o.object_to_animate.append(card_image)
-				card_image.pos_in_army = i
-				card_image.owner = board_state.top_player
-				card_image.scale = 0
-				o.place_card(card_image,None,i)
-				i += 1
+		o.refresh(board_state.bottom_player)
+		o.refresh(board_state.top_player)
 
 	def update_animation(o):
 
@@ -135,7 +137,6 @@ class on_enter_arena(Animation):
 			card = o.displayer.game_object[id_card]
 			card.scale = -2*t*t+3*t
 
-
 class refresh_board_state(Animation):# le but de cette animation est de dessiner le board state, en ignorant l'event
 
 	def __init__(o,displayer,board_state):
@@ -144,28 +145,9 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 		o.displayer.bot_player = o.board_state.bottom_player
 		o.displayer.top_player = o.board_state.top_player
 		displayer.game_object = {}
-		i = 0
-		for card in board_state.bottom_player.army:
-			if not card.ghost:
-				card_image = Card_image(card)
-				displayer.game_object[card.id] = card_image
-				o.object_to_animate.append(card_image)
-				card_image.pos_in_army = i
-				card_image.owner = board_state.bottom_player
-				o.place_card(card_image,None,i)
-				i += 1
-				
-		i = 0
-		for card in board_state.top_player.army:
-			if not card.ghost:
-				card_image = Card_image(card)
-				displayer.game_object[card.id] = card_image
-				o.object_to_animate.append(card_image)
-				card_image.pos_in_army = i
-				card_image.owner = board_state.top_player
-				o.place_card(card_image,None,i)
-				i += 1
-		t=0
+		
+		o.refresh(board_state.bottom_player)
+		o.refresh(board_state.top_player)
 
 
 	def update_animation(o):
@@ -221,38 +203,23 @@ class after_minion_attack(Animation):
 		v = o.back_pos
 		o.attacker_image.pos = t*v + (1-t)*u
 		t = o.current_frame/o.last_frame
-		o.target_image.pos = o.initial_target_pos + Vector(5*math.cos(6*math.pi*t),0)
+		o.target_image.pos = o.initial_target_pos + (5*math.cos(6*math.pi*t),0)
 		
 class on_take_damage(Animation):
-	def __init__(o,displayer,board_state):
+	def __init__(o,displayer,board_state,r=20):
 		Animation.__init__(o,displayer,board_state)
 		o.last_frame = 20
 
-		r = 20
-
-		font = pygame.font.Font('freesansbold.ttf', 20)
-
-		text = font.render(str(-board_state.event.param["damage"]), True, [255,255,0])
+		o.bubble_damage = Bubble_damage(board_state.event.param["damage"])
 		target_minion = displayer.game_object[board_state.event.param["target_minion"]]
 
-		o.circle = pygame.Surface([2*r,2*r])
-		o.circle.set_colorkey([0,0,0])
-		pygame.draw.circle(o.circle,[255,0,0],[r,r],r)
-
-		rect_text = text.get_rect()
-		rect_circle = o.circle.get_rect()
-
-		rect_circle.center = [target_minion.pos[0] + 37,target_minion.pos[1] + 74]
-		rect_text.center = [r,r]
-
-		o.circle.blit(text,rect_text)
-		o.circle.draw_pos = rect_circle
+		o.bubble_damage.pos = target_minion.pos
 		
-		displayer.game_object[id(o.circle)] = o.circle
+		displayer.displayer_object.append(o.bubble_damage)
 
 	def update_animation(o):
 		if o.current_frame >= o.last_frame:
-			displayer.game_object.pop(id(o.circle), None)
+			o.displayer.displayer_object.remove(o.bubble_damage)
 
 
 		
