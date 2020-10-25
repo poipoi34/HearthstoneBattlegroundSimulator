@@ -250,7 +250,7 @@ class after_minion_attack(Animation):
 		#pos(t) = t*v + (1-t)*u où u = starting pos et v = ending pos
 		u = o.starting_pos
 		v = o.back_pos
-		o.attacker_image.pos = t*v + (1-t)*u
+		o.displayer.game_object[o.board_state.event.param["source_minion"]].pos = t*v + (1-t)*u
 		t = o.current_frame/o.last_frame
 		o.displayer.game_object[o.board_state.event.param["target_minion"]].pos = o.initial_target_pos + (5*math.cos(6*math.pi*t),0)
 		
@@ -260,7 +260,7 @@ class on_take_damage(Animation):
 		return 20
 
 	def get_id_used (board_state):#static method giving the id of game_object moved
-		return [board_state.event.param["target_minion"]]
+		return []
 
 	def __init__(o,displayer,board_state,r=20):
 		Animation.__init__(o,displayer,board_state)
@@ -273,6 +273,7 @@ class on_take_damage(Animation):
 		displayer.displayer_object.append(o.bubble_damage)
 
 	def update_animation(o):
+		o.bubble_damage.pos = o.displayer.game_object[o.board_state.event.param["target_minion"]].pos
 		if o.current_frame >= o.last_frame:
 			o.displayer.displayer_object.remove(o.bubble_damage)
 
