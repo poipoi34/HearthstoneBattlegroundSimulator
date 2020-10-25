@@ -24,6 +24,13 @@ class Displayer:
 
 		o.game_object = {}
 		o.displayer_object = []
+		o.time_line = []
+		o.event_sequence = [] # no real use, it's a debugging feature
+		o.running_animation = []
+		o.current_frame = 0
+		o.chrono = m_animation.Chrono()
+		o.frame_by_frame = True
+		o.frame_time = 0.016
 
 
 		o.display_mode = "arena"
@@ -39,18 +46,41 @@ class Displayer:
 
 	def play(o,battle_data):#play a game from a finished written battle_data or a battle_data in writing in a thread
 		end_of_battle = False
-		i = -1
-		while not end_of_battle:
+		o.make_time_line(battle_data)
+
+		i = 0
+		o.chrono.start()
+
+		while not end_of_battle or o.running_animation != []:
+
+			frame_to_jump = 0
+			if not o.frame_by_frame:
+				frame_to_jump = o.chrono.elapsed_time() // o.frame_time
+				if frame_to_jump != 0:
+					o.current_frame = o.current_frame + frame_to_jump
+					o.rewind(frame_to_jump * o.frame_time)
+			if o.frame_by_frame:
+				if (o.chrono.elapsed_time() >= o.frame_time):
+					o.current_frame += 1
+					frame_to_jump = 1
+					o.chrono.start()
+
 			if i<len(battle_data)-1:
-				i+=1
-				animation = o.make_animation(battle_data[i]) # switch sur l'event_type pour savoir quel enfant de animation faire
-				finished = False
-				while not finished :
-					finished,changed = animation.update()
-					if changed:
-						o.draw_everything()
-				if battle_data[i].event.type == "end_of_battle":
-					end_of_battle = True
+				
+				while i<len(battle_data)-1 and o.current_frame >= o.time_line[i]:
+					o.buffer_animation(battle_data[i])
+					if battle_data[i].event.type == "end_of_battle":
+						end_of_battle = True
+					i+=1
+
+			for anim in o.running_animation:
+				finished = anim.update(frame_to_jump)
+				if finished:
+					o.running_animation.remove(anim)
+
+			o.draw_everything()
+
+				
 
 			##pygame loop
 			for event in pg.event.get():
@@ -67,21 +97,52 @@ class Displayer:
 			o.screen.blit(display_object.get_transformed_image(),display_object.get_draw_pos())
 		o.update()
 
+	def make_time_line(o,battle_data):
+		frame_cursor = 0
+		i = 0
+		while i < len(battle_data):
+			stop = False
+			max_length = 0
+			id_used = []
+			while not stop and i<len(battle_data):
+				animation_type = m_animation.event_animation_correspondance[battle_data[i].event.type]
+				o.time_line.append(frame_cursor)
+				max_length = max(max_length,animation_type.get_length(battle_data[i]))
+				id_used += animation_type.get_id_used(battle_data[i])
+				if i>= len(battle_data)-1:
+					break
+				next_animation = m_animation.event_animation_correspondance[battle_data[i+1].event.type]
+				if animation_type.stopping or o.conflict(id_used,next_animation.get_id_used(battle_data[i+1])):
+					stop = True
+				else :
+					i+=1
+					
+			frame_cursor += max_length
+			i+=1
 
-	def make_animation(o,board_state):
+	def conflict(o,id_used,id_list):
+		for id in id_list:
+			if id_used.count(id) > 0:
+				return True
+		return False
+		
+			
+
+
+	def buffer_animation(o,board_state):
 		event_type = board_state.event.type
 		if event_type == "on_enter_arena":
-			return m_animation.on_enter_arena(o,board_state) 
+			o.running_animation.append(m_animation.on_enter_arena(o,board_state))
 		if event_type == "before_minion_attack":
-			return m_animation.before_minion_attack(o,board_state) 
+			o.running_animation.append(m_animation.before_minion_attack(o,board_state))
 		if event_type == "on_minion_attack":
-			return m_animation.on_minion_attack(o,board_state) 
+			o.running_animation.append(m_animation.on_minion_attack(o,board_state))
 		if event_type == "after_minion_attack":
-			return m_animation.after_minion_attack(o,board_state) 
+			o.running_animation.append( m_animation.after_minion_attack(o,board_state))
 		if event_type == "on_take_damage":
-			return m_animation.on_take_damage(o,board_state)
+			o.running_animation.append(m_animation.on_take_damage(o,board_state))
 		else:
-			return m_animation.refresh_board_state(o,board_state)
+			o.running_animation.append(m_animation.refresh_board_state(o,board_state))
 
 			
 			

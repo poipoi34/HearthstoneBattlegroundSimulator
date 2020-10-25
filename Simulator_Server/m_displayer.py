@@ -8,8 +8,6 @@ from sys import exit
 import m_battle
 from m_event import Listener
 from inspect import signature
-from m_Card_image import Card_image
-import m_animation
 
 card_width = 75
 card_height = 150
@@ -141,58 +139,6 @@ class Displayer(Listener):
 			
 	def react_minion_after_attack(o, listener, param):
 		o.update_arena()
-			
-
-		
-		######## SECOND GENERATION DISPLAYER ########
-
-	def play(o,battle_data):#play a game from a finished written battle_data or a battle_data in writing in a thread
-		end_of_battle = False
-		i = -1
-		while not end_of_battle:
-			if i<len(battle_data)-1:
-				i+=1
-				animation = o.make_animation(battle_data[i]) # switch sur l'event_type pour savoir quel enfant de animation faire
-				finished = False
-				while not finished :
-					finished,changed = animation.update()
-					if changed:
-						o.draw_everything()
-				if battle_data[i].event.type == "end_of_battle":
-					end_of_battle = True
-
-			##pygame loop
-			for event in pg.event.get():
-				if event.type == pg.QUIT:
-					displayer.quit()
-
-	def draw_everything(o):
-		o.screen.fill([0,0,0])
-		for id_card in o.card_to_draw:
-			card = o.card_to_draw[id_card]
-			pos = []
-			o.screen.blit(card.get_image(),card.draw_pos)
-		o.screen.blit(o.arena,[0,0])
-		o.update()
-
-
-
-
-	def make_animation(o,board_state):
-		event_type = board_state.event.type
-		if event_type == "on_enter_arena":
-			return m_animation.on_enter_arena(o,board_state) 
-		if event_type == "before_minion_attack":
-			return m_animation.before_minion_attack(o,board_state) 
-		if event_type == "on_minion_attack":
-			return m_animation.on_minion_attack(o,board_state) 
-		if event_type == "after_minion_attack":
-			return m_animation.after_minion_attack(o,board_state) 
-		else:
-			return m_animation.refresh_board_state(o,board_state)
-
-			
-			
 	
 	def update(o):
 		if (o.display_mode == "arena"):

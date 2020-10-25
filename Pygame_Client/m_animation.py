@@ -3,6 +3,8 @@ from m_object import *
 import math
 from vector_math import *
 
+
+
 class Chrono:
 	def __init__(o):
 		o.elasped_time = None
@@ -27,44 +29,46 @@ class Chrono:
 #une animation est lié à une liste de animated_object et s'occupe de les bouger
 #la class Animation est abstraite
 class Animation:
-	
-	def __init__(o, displayer,board_state):
-		o.board_state = board_state
-		o.chrono = Chrono()
-		o.frame_time = 0.016
-		o.displayer = displayer
-		o.chrono_started = False
-		o.time_dependant = True
-		o.current_frame = 0
-		o.last_frame = 1
-		o.object_to_animate = []
+	stopping = True
+	def get_length(board_state):
+		return 1
+	def get_id_used (board_state):#static method giving the id of game_object moved, should be overwritten in Animation childs
+		return []
 
-	def update(o):
-		finished,changed = False,False
-		if o.chrono_started == False:
-			o.chrono.start()
-			o.chrono_started = True
+	def __init__(o, displayer,board_state = None):
+		o.board_state = board_state
+		o.displayer = displayer
+		o.time_dependant = True
+		o.object_to_animate = []
+		o.started = False
+		o.current_frame = 0
+		o.last_frame = type(o).get_length(board_state)
+		o.displayer = displayer
+		o.board_state = board_state
+
+
+	def update(o,frame_to_jump = 1):
+		finished = False
+
+		"""
+		if frame_to_jump > 0:
+			o.current_frame += frame_to_jump
 			o.update_animation()
-			changed = True
-		if not o.time_dependant:
-			frame_to_jump = chrono.elapsed_time() // o.frame_time
-			if frame_to_jump != 0:
-				o.current_frame = min(o.current_frame + frame_to_jump,o.last_frame)
-				o.rewind(frame_to_jump * o.frame_time)
-				o.update_animation()
-				changed = True
-		if o.time_dependant:
-			if (o.chrono.elapsed_time() >= o.frame_time):
-				o.current_frame = min(o.current_frame + 1,o.last_frame)
-				o.chrono.start()
-				o.update_animation()
-				changed = True
 		if (o.current_frame >= o.last_frame):
 			finished = True
 		else: finished = False
-		return finished,changed
+		return finished
+		"""
+		if frame_to_jump > 0:
+			o.current_frame += frame_to_jump
+			if (o.current_frame >= o.last_frame):
+				finished = True
+			o.update_animation()
+		else: finished = False
+		return finished
+		
 
-	def place_card(o,card_image, board_state,p_in_army = None):#place card using card place using board_state or p_in_army
+	def place_card(o,card_image, board_state,p_in_army = None):#place card using card place in army using board_state or p_in_army
 		card_image.pos = o.get_card_placement(card_image,board_state,p_in_army)
 	
 	def get_card_placement(o,card_image,board_state,p_in_army = None):
@@ -107,18 +111,29 @@ class Animation:
 				i += 1
 
 class on_enter_arena(Animation):
-
+	stopping = True
+	def get_length(board_state):
+		return 60
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		id_used = []
+		for card_interface in board_state.bottom_player.army:
+			id_used.append(card_interface.id)
+		for card_interface in board_state.top_player.army:
+			id_used.append(card_interface.id)
+		return id_used
+		
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
-		displayer.event = board_state.event # ? à quoi ça sert?
 
+		displayer.event = board_state.event # ? à quoi ça sert?
 		displayer.bot_player = board_state.bottom_player
 		displayer.top_player = board_state.top_player
 
-		o.last_frame = 60
+		
 			
 		o.refresh(board_state.bottom_player)
 		o.refresh(board_state.top_player)
+
 
 	def update_animation(o):
 
@@ -138,10 +153,21 @@ class on_enter_arena(Animation):
 			card.scale = -2*t*t+3*t
 
 class refresh_board_state(Animation):# le but de cette animation est de dessiner le board state, en ignorant l'event
+	stopping = True
+	def get_length(board_state):
+		return 10
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		id_used = []
+		for card_interface in board_state.bottom_player.army:
+			id_used.append(card_interface.id)
+		for card_interface in board_state.top_player.army:
+			id_used.append(card_interface.id)
+		return id_used
 
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
-		o.last_frame = 10
+		
+
 		o.displayer.bot_player = o.board_state.bottom_player
 		o.displayer.top_player = o.board_state.top_player
 		displayer.game_object = {}
@@ -154,18 +180,34 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 		pass
 
 class before_minion_attack(Animation):
+	stopping = True
+	def get_length(board_state):
+		return 30
+
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		return [board_state.event.param["source_minion"]]
+
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
-		o.last_frame = 30
+
 		o.object_to_animate.append(displayer.game_object[board_state.event.param["source_minion"]])
+		
 
 	def update_animation(o):
-		o.object_to_animate[0].scale = 1 + o.current_frame/o.last_frame*0.3
+		k=0
+		o.displayer.game_object[o.board_state.event.param["source_minion"]].scale = 1 + o.current_frame/o.last_frame*0.3
 
 class on_minion_attack(Animation):
+	stopping = True
+	def get_length(board_state):
+		return 30
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		return [board_state.event.param["source_minion"],board_state.event.param["target_minion"]]
+
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
-		o.last_frame = 30
+		
+
 		o.object_to_animate.append(displayer.game_object[board_state.event.param["source_minion"]])
 		o.object_to_animate.append(displayer.game_object[board_state.event.param["target_minion"]])
 
@@ -178,12 +220,19 @@ class on_minion_attack(Animation):
 		#f(0) = 0, f(1) = 3/4 et f(t) = at² - t
 		#a = 7/4
 		#p(t) = (1-f(t))*u + f(t)*v avec u = o.u et v = o.object_to_animate[1].pos
-		o.object_to_animate[0].pos = (1-7/4*t*t+t)*o.u + (7/4*t*t-t)*o.object_to_animate[1].pos
+		o.displayer.game_object[o.board_state.event.param["source_minion"]].pos = (1-7/4*t*t+t)*o.u + (7/4*t*t-t)*o.object_to_animate[1].pos
 
 class after_minion_attack(Animation):
+	stopping = True
+	def get_length(board_state):
+		return 30
+
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		return [board_state.event.param["source_minion"],board_state.event.param["target_minion"]]
+
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
-		o.last_frame = 30
+		
 
 		attacker_id = board_state.event.param["source_minion"]
 		attacked_id = board_state.event.param["target_minion"]
@@ -203,12 +252,18 @@ class after_minion_attack(Animation):
 		v = o.back_pos
 		o.attacker_image.pos = t*v + (1-t)*u
 		t = o.current_frame/o.last_frame
-		o.target_image.pos = o.initial_target_pos + (5*math.cos(6*math.pi*t),0)
+		o.displayer.game_object[o.board_state.event.param["target_minion"]].pos = o.initial_target_pos + (5*math.cos(6*math.pi*t),0)
 		
 class on_take_damage(Animation):
+	stopping = False
+	def get_length(board_state):
+		return 20
+
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		return [board_state.event.param["target_minion"]]
+
 	def __init__(o,displayer,board_state,r=20):
 		Animation.__init__(o,displayer,board_state)
-		o.last_frame = 20
 
 		o.bubble_damage = Bubble_damage(board_state.event.param["damage"])
 		target_minion = displayer.game_object[board_state.event.param["target_minion"]]
@@ -222,15 +277,37 @@ class on_take_damage(Animation):
 			o.displayer.displayer_object.remove(o.bubble_damage)
 
 
-		
-
 
 #création d'une animation: 
 
 """
 class my_anim(Animation):
+	stopping = True
+	def get_length(board_state):
+		return 30
+	def get_id_used (board_state):#static method giving the id of game_object moved
+		
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
-		o.last_frame = 30
+
 	def update_animation(o):
 """
+
+
+
+
+class Event_animation_correspondance:
+	dict= {"on_enter_arena" : on_enter_arena,
+								  "before_minion_attack" : before_minion_attack,
+								  "on_minion_attack" : on_minion_attack,
+								  "after_minion_attack" : after_minion_attack,
+								  "on_take_damage" : on_take_damage,
+								  }
+	def __getitem__(o,key):
+		if key in o.dict:
+			return o.dict[key]
+		else:
+			return refresh_board_state
+
+event_animation_correspondance = Event_animation_correspondance()
+

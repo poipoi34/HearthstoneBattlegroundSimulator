@@ -59,9 +59,6 @@ for i in battle.battle_data:
 	print(str(i))
 
 
-displayer.play(battle.battle_data)
-
-
 
 #threading.Thread(target = pygame_loop).start()
 
