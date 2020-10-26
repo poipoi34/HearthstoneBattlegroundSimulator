@@ -131,18 +131,8 @@ class Displayer:
 
 	def buffer_animation(o,board_state):
 		event_type = board_state.event.type
-		if event_type == "on_enter_arena":
-			o.running_animation.append(m_animation.on_enter_arena(o,board_state))
-		if event_type == "before_minion_attack":
-			o.running_animation.append(m_animation.before_minion_attack(o,board_state))
-		if event_type == "on_minion_attack":
-			o.running_animation.append(m_animation.on_minion_attack(o,board_state))
-		if event_type == "after_minion_attack":
-			o.running_animation.append( m_animation.after_minion_attack(o,board_state))
-		if event_type == "on_take_damage":
-			o.running_animation.append(m_animation.on_take_damage(o,board_state))
-		else:
-			o.running_animation.append(m_animation.refresh_board_state(o,board_state))
+		animation = m_animation.event_animation_correspondance[event_type]
+		o.running_animation.append(animation(o,board_state))
 
 			
 			

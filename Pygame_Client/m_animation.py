@@ -32,7 +32,7 @@ class Animation:
 	stopping = True
 	def get_length(board_state):
 		return 1
-	def get_id_used (board_state):#static method giving the id of game_object moved, should be overwritten in Animation childs
+	def get_id_used (board_state):#static method giving the list of id of game_object moved, should be overwritten in Animation childs
 		return []
 
 	def __init__(o, displayer,board_state = None):
@@ -114,7 +114,7 @@ class on_enter_arena(Animation):
 	stopping = True
 	def get_length(board_state):
 		return 60
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		id_used = []
 		for card_interface in board_state.bottom_player.army:
 			id_used.append(card_interface.id)
@@ -156,7 +156,7 @@ class refresh_board_state(Animation):# le but de cette animation est de dessiner
 	stopping = True
 	def get_length(board_state):
 		return 10
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		id_used = []
 		for card_interface in board_state.bottom_player.army:
 			id_used.append(card_interface.id)
@@ -184,7 +184,7 @@ class before_minion_attack(Animation):
 	def get_length(board_state):
 		return 30
 
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		return [board_state.event.param["source_minion"]]
 
 	def __init__(o,displayer,board_state):
@@ -201,7 +201,7 @@ class on_minion_attack(Animation):
 	stopping = True
 	def get_length(board_state):
 		return 30
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		return [board_state.event.param["source_minion"],board_state.event.param["target_minion"]]
 
 	def __init__(o,displayer,board_state):
@@ -227,7 +227,7 @@ class after_minion_attack(Animation):
 	def get_length(board_state):
 		return 30
 
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		return [board_state.event.param["source_minion"],board_state.event.param["target_minion"]]
 
 	def __init__(o,displayer,board_state):
@@ -251,6 +251,7 @@ class after_minion_attack(Animation):
 		u = o.starting_pos
 		v = o.back_pos
 		o.displayer.game_object[o.board_state.event.param["source_minion"]].pos = t*v + (1-t)*u
+		a = o.object_to_animate[0]
 		t = o.current_frame/o.last_frame
 		o.displayer.game_object[o.board_state.event.param["target_minion"]].pos = o.initial_target_pos + (5*math.cos(6*math.pi*t),0)
 		
@@ -259,7 +260,7 @@ class on_take_damage(Animation):
 	def get_length(board_state):
 		return 20
 
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		return []
 
 	def __init__(o,displayer,board_state,r=20):
@@ -277,7 +278,37 @@ class on_take_damage(Animation):
 		if o.current_frame >= o.last_frame:
 			o.displayer.displayer_object.remove(o.bubble_damage)
 
+class on_minion_death(Animation):
+	stopping = False
+	def get_length(board_state):
+		return 30
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
+		return [board_state.event.param["source_minion"]]
 
+	def __init__(o,displayer,board_state):
+		Animation.__init__(o,displayer,board_state)
+		o.dead_minion_id = board_state.event.param["source_minion"]
+
+	def update_animation(o):
+		t = o.current_frame/o.last_frame
+		if o.dead_minion_id in o.displayer.game_object:
+			minion = o.displayer.game_object[o.dead_minion_id]
+			minion.scale = (1-t)
+		else:
+			print("trying to scale removed minion in death animation")
+
+class after_minion_death(Animation):
+	stopping = False
+	def get_length(board_state):
+		return 10
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
+		return []
+
+	def __init__(o,displayer,board_state):
+		Animation.__init__(o,displayer,board_state)
+
+	def update_animation(o):
+		pass
 
 #création d'une animation: 
 
@@ -286,7 +317,7 @@ class my_anim(Animation):
 	stopping = True
 	def get_length(board_state):
 		return 30
-	def get_id_used (board_state):#static method giving the id of game_object moved
+	def get_id_used (board_state):#static method giving the list of id of game_object moved
 		
 	def __init__(o,displayer,board_state):
 		Animation.__init__(o,displayer,board_state)
@@ -297,12 +328,21 @@ class my_anim(Animation):
 
 
 
+
+
+
+
+
+
+
 class Event_animation_correspondance:
 	dict= {"on_enter_arena" : on_enter_arena,
 								  "before_minion_attack" : before_minion_attack,
 								  "on_minion_attack" : on_minion_attack,
 								  "after_minion_attack" : after_minion_attack,
 								  "on_take_damage" : on_take_damage,
+								  "on_minion_death" : on_minion_death,
+								  "after_minion_death" : after_minion_death,
 								  }
 	def __getitem__(o,key):
 		if key in o.dict:
